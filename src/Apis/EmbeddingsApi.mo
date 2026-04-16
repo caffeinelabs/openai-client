@@ -91,7 +91,7 @@ module {
             body = do ? {
                 let jsonValue = CreateEmbeddingRequest.toJSON(createEmbeddingRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, [], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["input", "model", "encoding_format", "dimensions", "user"], null) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };

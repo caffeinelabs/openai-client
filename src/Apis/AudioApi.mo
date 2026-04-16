@@ -99,7 +99,7 @@ module {
             body = do ? {
                 let jsonValue = CreateSpeechRequest.toJSON(createSpeechRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, [], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["model", "input", "instructions", "voice", "response_format", "speed"], null) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };

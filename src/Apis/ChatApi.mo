@@ -98,7 +98,7 @@ module {
             body = do ? {
                 let jsonValue = CreateChatCompletionRequest.toJSON(createChatCompletionRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, [], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata", "temperature", "top_p", "user", "service_tier", "messages", "model", "modalities", "reasoning_effort", "max_completion_tokens", "frequency_penalty", "presence_penalty", "web_search_options", "top_logprobs", "response_format", "audio", "store", "stream", "stop", "logit_bias", "logprobs", "max_tokens", "n", "prediction", "seed", "stream_options", "tools", "tool_choice", "parallel_tool_calls", "function_call", "functions"], null) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };
@@ -509,7 +509,7 @@ module {
             body = do ? {
                 let jsonValue = UpdateChatCompletionRequest.toJSON(updateChatCompletionRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, [], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata"], null) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };

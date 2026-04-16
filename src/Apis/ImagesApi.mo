@@ -99,7 +99,7 @@ module {
             body = do ? {
                 let jsonValue = CreateImageRequest.toJSON(createImageRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, [], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["prompt", "model", "n", "quality", "response_format", "output_format", "output_compression", "size", "moderation", "background", "style", "user"], null) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };
