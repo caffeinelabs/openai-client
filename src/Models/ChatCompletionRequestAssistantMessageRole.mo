@@ -1,0 +1,31 @@
+/// The role of the messages author, in this case `assistant`.
+
+// ChatCompletionRequestAssistantMessageRole.mo
+/// Enum values: #assistant
+
+module {
+    // User-facing type: type-safe variants for application code
+    public type ChatCompletionRequestAssistantMessageRole = {
+        #assistant;
+    };
+
+    // JSON sub-module: everything needed for JSON serialization
+    public module JSON {
+        // JSON-facing Motoko type: mirrors JSON structure
+        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestAssistantMessageRole type
+        public type JSON = Text;
+
+        // Convert User-facing type to JSON-facing Motoko type
+        public func toJSON(value : ChatCompletionRequestAssistantMessageRole) : JSON =
+            switch (value) {
+                case (#assistant) "assistant";
+            };
+
+        // Convert JSON-facing Motoko type to User-facing type
+        public func fromJSON(json : JSON) : ?ChatCompletionRequestAssistantMessageRole =
+            switch (json) {
+                case "assistant" ?#assistant;
+                case _ null;
+            };
+    }
+}
