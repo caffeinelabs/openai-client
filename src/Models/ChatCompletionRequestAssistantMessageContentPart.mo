@@ -44,5 +44,9 @@ module {
                 case (#ChatCompletionRequestMessageContentPartText(v)) ?#ChatCompletionRequestMessageContentPartText(v);
                 case (#ChatCompletionRequestMessageContentPartRefusal(v)) ?#ChatCompletionRequestMessageContentPartRefusal(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : ChatCompletionRequestAssistantMessageContentPart) : ?Text = null;
     }
 }

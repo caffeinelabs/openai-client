@@ -32,5 +32,8 @@ module {
                 case "text-embedding-3-large" ?#text_embedding_3_large;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateEmbeddingRequestModelAnyOf) : ?Text = null;
     }
 }

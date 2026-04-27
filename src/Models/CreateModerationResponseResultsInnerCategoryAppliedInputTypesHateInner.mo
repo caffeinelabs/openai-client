@@ -26,5 +26,8 @@ module {
                 case "text" ?#text_;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner) : ?Text = null;
     }
 }

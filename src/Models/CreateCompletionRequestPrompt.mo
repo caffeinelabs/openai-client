@@ -49,5 +49,9 @@ module {
                 case (#one_of_2(v)) ?#one_of_2(v);
                 case (#_[Int](v)) ?#_[Int](v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : CreateCompletionRequestPrompt) : ?Text = null;
     }
 }

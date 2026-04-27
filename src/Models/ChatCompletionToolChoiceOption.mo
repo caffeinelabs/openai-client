@@ -47,5 +47,9 @@ module {
                 case (#ChatCompletionToolChoiceOptionOneOf(v)) ?#ChatCompletionToolChoiceOptionOneOf(v);
                 case (#ChatCompletionNamedToolChoice(v)) ?#ChatCompletionNamedToolChoice(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : ChatCompletionToolChoiceOption) : ?Text = null;
     }
 }

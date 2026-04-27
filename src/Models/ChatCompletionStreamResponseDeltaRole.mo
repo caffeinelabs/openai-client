@@ -39,5 +39,8 @@ module {
                 case "tool" ?#tool;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ChatCompletionStreamResponseDeltaRole) : ?Text = null;
     }
 }

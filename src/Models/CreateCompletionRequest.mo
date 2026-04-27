@@ -119,5 +119,16 @@ module {
                 user = json.user;
             }
         };
+
+        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
+        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
+        // bad JSON reach the upstream API and come back as an opaque 4xx.
+        public func validate(value : CreateCompletionRequest) : ?Text {
+            switch (CreateCompletionRequestModel.validate(value.model)) {
+                case (?msg) return ?msg;
+                case null ();
+            };
+            null
+        };
     }
 }

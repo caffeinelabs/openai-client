@@ -35,5 +35,8 @@ module {
                 case "text-moderation-stable" ?#text_moderation_stable;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateModerationRequestModelAnyOf) : ?Text = null;
     }
 }

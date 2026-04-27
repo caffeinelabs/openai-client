@@ -27,5 +27,8 @@ module {
                 case "transcript.text.delta" ?#transcript_text_delta;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : TranscriptTextDeltaEventType) : ?Text = null;
     }
 }

@@ -39,5 +39,9 @@ module {
                 case (#one_of_0(v)) ?#one_of_0(v);
                 case (#one_of_1(v)) ?#one_of_1(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : StopConfiguration) : ?Text = null;
     }
 }

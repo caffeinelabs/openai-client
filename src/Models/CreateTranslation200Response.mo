@@ -44,5 +44,9 @@ module {
                 case (#CreateTranslationResponseJson(v)) ?#CreateTranslationResponseJson(v);
                 case (#CreateTranslationResponseVerboseJson(v)) ?#CreateTranslationResponseVerboseJson(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : CreateTranslation200Response) : ?Text = null;
     }
 }

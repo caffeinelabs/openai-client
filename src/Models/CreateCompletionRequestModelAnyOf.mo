@@ -32,5 +32,8 @@ module {
                 case "babbage-002" ?#babbage_002;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateCompletionRequestModelAnyOf) : ?Text = null;
     }
 }

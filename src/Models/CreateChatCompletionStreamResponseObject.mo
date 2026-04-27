@@ -27,5 +27,8 @@ module {
                 case "chat.completion.chunk" ?#chat_completion_chunk;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateChatCompletionStreamResponseObject) : ?Text = null;
     }
 }

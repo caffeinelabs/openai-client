@@ -30,5 +30,8 @@ module {
                 case "mp3" ?#mp3;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ChatCompletionRequestMessageContentPartAudioInputAudioFormat) : ?Text = null;
     }
 }

@@ -30,5 +30,8 @@ module {
                 case "auto" ?#auto;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateImageRequestModeration) : ?Text = null;
     }
 }

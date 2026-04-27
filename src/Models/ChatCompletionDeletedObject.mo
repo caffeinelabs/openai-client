@@ -27,5 +27,8 @@ module {
                 case "chat.completion.deleted" ?#chat_completion_deleted;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ChatCompletionDeletedObject) : ?Text = null;
     }
 }

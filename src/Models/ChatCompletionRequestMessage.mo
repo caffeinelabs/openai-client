@@ -78,5 +78,9 @@ module {
                 case (#ChatCompletionRequestToolMessage(v)) ?#ChatCompletionRequestToolMessage(v);
                 case (#ChatCompletionRequestFunctionMessage(v)) ?#ChatCompletionRequestFunctionMessage(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : ChatCompletionRequestMessage) : ?Text = null;
     }
 }

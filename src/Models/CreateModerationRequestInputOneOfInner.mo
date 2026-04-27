@@ -46,5 +46,9 @@ module {
                 case (#CreateModerationRequestInputOneOfInnerOneOf(v)) ?#CreateModerationRequestInputOneOfInnerOneOf(v);
                 case (#CreateModerationRequestInputOneOfInnerOneOf1(v)) ?#CreateModerationRequestInputOneOfInnerOneOf1(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : CreateModerationRequestInputOneOfInner) : ?Text = null;
     }
 }

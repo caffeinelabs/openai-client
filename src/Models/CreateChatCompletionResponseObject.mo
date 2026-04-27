@@ -27,5 +27,8 @@ module {
                 case "chat.completion" ?#chat_completion;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateChatCompletionResponseObject) : ?Text = null;
     }
 }

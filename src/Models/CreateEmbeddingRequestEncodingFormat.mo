@@ -30,5 +30,8 @@ module {
                 case "base64" ?#base64;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateEmbeddingRequestEncodingFormat) : ?Text = null;
     }
 }

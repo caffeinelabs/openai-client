@@ -32,5 +32,8 @@ module {
                 case "gpt-4o-mini-tts" ?#gpt_4o_mini_tts;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateSpeechRequestModelAnyOf) : ?Text = null;
     }
 }

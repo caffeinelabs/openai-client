@@ -64,5 +64,9 @@ module {
                 case (#ChatCompletionRequestMessageContentPartAudio(v)) ?#ChatCompletionRequestMessageContentPartAudio(v);
                 case (#ChatCompletionRequestMessageContentPartFile(v)) ?#ChatCompletionRequestMessageContentPartFile(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : ChatCompletionRequestUserMessageContentPart) : ?Text = null;
     }
 }

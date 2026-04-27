@@ -30,5 +30,8 @@ module {
                 case "b64_json" ?#b64_json;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateImageRequestResponseFormat) : ?Text = null;
     }
 }

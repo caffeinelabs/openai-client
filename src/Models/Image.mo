@@ -28,5 +28,10 @@ module {
 
         // Convert JSON-facing Motoko type to User-facing type
         public func fromJSON(json : JSON) : ?Image = ?json;
+
+        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
+        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
+        // bad JSON reach the upstream API and come back as an opaque 4xx.
+        public func validate(_value : Image) : ?Text = null;
     }
 }

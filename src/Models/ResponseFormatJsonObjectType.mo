@@ -27,5 +27,8 @@ module {
                 case "json_object" ?#json_object;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ResponseFormatJsonObjectType) : ?Text = null;
     }
 }

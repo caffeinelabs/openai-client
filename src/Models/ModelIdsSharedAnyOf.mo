@@ -182,5 +182,8 @@ module {
                 case "gpt-3.5-turbo-16k-0613" ?#gpt_3_5_turbo_16k_0613;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ModelIdsSharedAnyOf) : ?Text = null;
     }
 }

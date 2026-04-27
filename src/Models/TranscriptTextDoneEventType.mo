@@ -27,5 +27,8 @@ module {
                 case "transcript.text.done" ?#transcript_text_done;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : TranscriptTextDoneEventType) : ?Text = null;
     }
 }

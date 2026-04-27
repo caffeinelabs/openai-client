@@ -6,7 +6,7 @@ import Blob "mo:core/Blob";
 import Array "mo:core/Array";
 import Error "mo:core/Error";
 import Base64 "mo:core/Base64";
-import { JSON } "mo:serde";
+import { JSON; Candid } "mo:serde-core";
 import { type ChatCompletionDeleted; JSON = ChatCompletionDeleted } "../Models/ChatCompletionDeleted";
 import { type ChatCompletionList; JSON = ChatCompletionList } "../Models/ChatCompletionList";
 import { type ChatCompletionMessageList; JSON = ChatCompletionMessageList } "../Models/ChatCompletionMessageList";
@@ -96,9 +96,19 @@ module {
             method = #post;
             headers;
             body = do ? {
+
+                // Pre-flight validation (`diagnostics=true`): if the request body's type
+                // (or any nested empty-fallback field) carries a generator diagnostic,
+                // throw it now so the consumer's `catch (e) { e.message() }` sees the
+                // explanation directly instead of a downstream HTTP 4xx.
+                switch (CreateChatCompletionRequest.validate(createChatCompletionRequest)) {
+                    case (?msg) throw Error.reject(msg);
+                    case null ();
+                };
+
                 let jsonValue = CreateChatCompletionRequest.toJSON(createChatCompletionRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata", "temperature", "top_p", "user", "service_tier", "messages", "model", "modalities", "reasoning_effort", "max_completion_tokens", "frequency_penalty", "presence_penalty", "web_search_options", "top_logprobs", "response_format", "audio", "store", "stream", "stop", "logit_bias", "logprobs", "max_tokens", "n", "prediction", "seed", "stream_options", "tools", "tool_choice", "parallel_tool_calls", "function_call", "functions"], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata", "temperature", "top_p", "user", "service_tier", "messages", "model", "modalities", "reasoning_effort", "max_completion_tokens", "frequency_penalty", "presence_penalty", "web_search_options", "top_logprobs", "response_format", "audio", "store", "stream", "stop", "logit_bias", "logprobs", "max_tokens", "n", "prediction", "seed", "stream_options", "tools", "tool_choice", "parallel_tool_calls", "function_call", "functions"], ?{ Candid.defaultOptions with skip_null_fields = true }) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };
@@ -111,11 +121,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?CreateChatCompletionResponse.JSON |>
             (switch (_) {
@@ -125,7 +135,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to CreateChatCompletionResponse");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -192,11 +202,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?ChatCompletionDeleted.JSON |>
             (switch (_) {
@@ -206,7 +216,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to ChatCompletionDeleted");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -273,11 +283,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?CreateChatCompletionResponse.JSON |>
             (switch (_) {
@@ -287,7 +297,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to CreateChatCompletionResponse");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -355,11 +365,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?ChatCompletionMessageList.JSON |>
             (switch (_) {
@@ -369,7 +379,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to ChatCompletionMessageList");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -436,11 +446,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?ChatCompletionList.JSON |>
             (switch (_) {
@@ -450,7 +460,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to ChatCompletionList");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -507,9 +517,19 @@ module {
             method = #post;
             headers;
             body = do ? {
+
+                // Pre-flight validation (`diagnostics=true`): if the request body's type
+                // (or any nested empty-fallback field) carries a generator diagnostic,
+                // throw it now so the consumer's `catch (e) { e.message() }` sees the
+                // explanation directly instead of a downstream HTTP 4xx.
+                switch (UpdateChatCompletionRequest.validate(updateChatCompletionRequest)) {
+                    case (?msg) throw Error.reject(msg);
+                    case null ();
+                };
+
                 let jsonValue = UpdateChatCompletionRequest.toJSON(updateChatCompletionRequest);
                 let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata"], null) else throw Error.reject("Failed to serialize to JSON");
+                let #ok(jsonText) = JSON.toText(candidBlob, ["metadata"], ?{ Candid.defaultOptions with skip_null_fields = true }) else throw Error.reject("Failed to serialize to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };
@@ -522,11 +542,11 @@ module {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
                 case (#ok(blob)) blob;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
             from_candid(_) : ?CreateChatCompletionResponse.JSON |>
             (switch (_) {
@@ -536,7 +556,7 @@ module {
                         case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to CreateChatCompletionResponse");
                     }
                 };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response");
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw

@@ -29,5 +29,8 @@ module {
                 case "gpt-image-1" ?#gpt_image_1;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateImageEditRequestModelAnyOf) : ?Text = null;
     }
 }

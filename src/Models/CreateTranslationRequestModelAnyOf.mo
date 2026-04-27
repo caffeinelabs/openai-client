@@ -26,5 +26,8 @@ module {
                 case "whisper-1" ?#whisper_1;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateTranslationRequestModelAnyOf) : ?Text = null;
     }
 }

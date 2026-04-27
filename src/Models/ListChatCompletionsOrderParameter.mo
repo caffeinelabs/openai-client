@@ -29,5 +29,8 @@ module {
                 case "desc" ?#desc;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ListChatCompletionsOrderParameter) : ?Text = null;
     }
 }

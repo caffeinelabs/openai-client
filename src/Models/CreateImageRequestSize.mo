@@ -48,5 +48,8 @@ module {
                 case "1024x1792" ?#_1024x1792;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateImageRequestSize) : ?Text = null;
     }
 }

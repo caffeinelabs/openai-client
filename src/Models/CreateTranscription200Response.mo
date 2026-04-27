@@ -48,5 +48,9 @@ module {
                 case (#CreateTranscriptionResponseJson(v)) ?#CreateTranscriptionResponseJson(v);
                 case (#CreateTranscriptionResponseVerboseJson(v)) ?#CreateTranscriptionResponseVerboseJson(v);
             };
+
+        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
+        // pass through (recursive variant inspection is a v2 follow-up).
+        public func validate(_value : CreateTranscription200Response) : ?Text = null;
     }
 }

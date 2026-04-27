@@ -37,5 +37,10 @@ module {
                 input_audio;
             }
         };
+
+        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
+        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
+        // bad JSON reach the upstream API and come back as an opaque 4xx.
+        public func validate(_value : ChatCompletionRequestMessageContentPartAudio) : ?Text = null;
     }
 }

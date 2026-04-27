@@ -83,5 +83,19 @@ module {
                 style = do ? { CreateImageRequestStyle.fromJSON(json.style!)! };
             }
         };
+
+        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
+        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
+        // bad JSON reach the upstream API and come back as an opaque 4xx.
+        public func validate(value : CreateImageRequest) : ?Text {
+            switch (value.model) {
+                case (?inner) switch (CreateImageRequestModel.validate(inner)) {
+                    case (?msg) return ?msg;
+                    case null ();
+                };
+                case null ();
+            };
+            null
+        };
     }
 }

@@ -42,5 +42,8 @@ module {
                 case "evals" ?#evals;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : CreateFileRequestPurpose) : ?Text = null;
     }
 }

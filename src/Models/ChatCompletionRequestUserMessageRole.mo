@@ -27,5 +27,8 @@ module {
                 case "user" ?#user;
                 case _ null;
             };
+
+        // Pre-flight validation (`diagnostics=true`): enums are always valid.
+        public func validate(_value : ChatCompletionRequestUserMessageRole) : ?Text = null;
     }
 }
