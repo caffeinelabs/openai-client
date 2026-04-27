@@ -4,6 +4,18 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3](https://github.com/caffeinelabs/openai-client/releases/tag/v0.1.3) — 2026-04-27
+
+### Fixed
+
+- Bumps `serde-core` to `0.1.1` to pull in the Candid type-table cycle fix.
+  `JSON.toText(to_candid(req), …)` no longer traps with `IC0502: Canister
+  trapped: stack overflow` when `req` carries a `?Map<K, V>` field. Affects
+  every `ChatApi.createChatCompletion` call in practice — the request type
+  has both `metadata : ?Map<Text, Text>` and `logit_bias : ?Map<Text, Int>`,
+  whose self-referential RBT type entries used to send the decoder into
+  unbounded re-expansion before any byte of the value was inspected.
+
 ## [0.1.2](https://github.com/caffeinelabs/openai-client/releases/tag/v0.1.2) — 2026-04-27
 
 ### Fixed
