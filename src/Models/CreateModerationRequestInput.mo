@@ -4,6 +4,7 @@ import { type CreateModerationRequestInputOneOfInner; JSON = CreateModerationReq
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateModerationRequestInput.mo
 // Generic oneOf (no discriminator, no flatten) — wire form is `{"#tag": ...}`.

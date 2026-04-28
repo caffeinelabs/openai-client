@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // VoiceIdsSharedAnyOf.mo
 /// Enum values: #alloy, #ash, #ballad, #coral, #echo, #fable, #onyx, #nova, #sage, #shimmer, #verse

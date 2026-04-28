@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // OpenAIFilePurpose.mo
 /// Enum values: #assistants, #assistants_output, #batch, #batch_output, #fine_tune, #fine_tune_results, #vision

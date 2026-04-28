@@ -8,6 +8,7 @@ import { type OpenAIFileStatus; JSON = OpenAIFileStatus } "./OpenAIFileStatus";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // OpenAIFile.mo
 
@@ -57,11 +58,11 @@ module {
                     let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     let ?bytes_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes") else return null;
-                    let ?bytes = ((switch (bytes_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?bytes = ((switch (bytes_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let ?created_at_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created_at") else return null;
-                    let ?created_at = ((switch (created_at_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?created_at = ((switch (created_at_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let expires_at : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "expires_at")) {
-                        case (?expires_at_field) ((switch (expires_at_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?expires_at_field) ((switch (expires_at_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let ?filename_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "filename") else return null;

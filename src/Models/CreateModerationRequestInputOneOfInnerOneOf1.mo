@@ -4,6 +4,7 @@ import { type CreateModerationRequestInputOneOfInnerOneOf1Type; JSON = CreateMod
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateModerationRequestInputOneOfInnerOneOf1.mo
 

@@ -4,6 +4,7 @@ import { type ResponseFormatTextType; JSON = ResponseFormatTextType } "./Respons
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ResponseFormatText.mo
 

@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionDeletedObject.mo
 /// Enum values: #chat_completion_deleted

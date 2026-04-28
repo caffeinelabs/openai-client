@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateImageRequestModelAnyOf.mo
 /// Enum values: #dall_e_2, #dall_e_3, #gpt_image_1

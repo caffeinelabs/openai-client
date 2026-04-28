@@ -3,6 +3,7 @@ import Text "mo:core/Text";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateCompletionResponseChoicesInnerLogprobs.mo
 
@@ -44,7 +45,7 @@ module {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Int>();
                             for (c__ in xs__.values()) {
-                                let #Int(i__) = c__ else return null;
+                                let ?i__ = (switch (c__) { case (#Int(j)) ?j; case (#Nat(k)) ?k; case _ null }) else return null;
                                 List.add(buf__, i__);
                             };
                             ?List.toArray(buf__);
@@ -58,7 +59,7 @@ module {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Float>();
                             for (c__ in xs__.values()) {
-                                let #Float(f__) = c__ else return null;
+                                let ?f__ = (switch (c__) { case (#Float(g)) ?g; case (#Int(j)) ?Float.fromInt(j); case (#Nat(k)) ?Float.fromInt(k); case _ null }) else return null;
                                 List.add(buf__, f__);
                             };
                             ?List.toArray(buf__);

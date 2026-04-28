@@ -4,6 +4,7 @@ import { type CreateTranslationRequestModelAnyOf; JSON = CreateTranslationReques
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateTranslationRequestModel.mo
 // anyOf / oneOf where every branch produces a JSON string on the wire — flattened to `Text`.

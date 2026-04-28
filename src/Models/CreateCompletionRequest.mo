@@ -11,6 +11,7 @@ import Text "mo:core/Text";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 import Int "mo:core/Int";
 
 // CreateCompletionRequest.mo
@@ -18,7 +19,7 @@ import Int "mo:core/Int";
 module {
     public type CreateCompletionRequest = {
         model : CreateCompletionRequestModel;
-        prompt : CreateCompletionRequestPrompt;
+        prompt : ?CreateCompletionRequestPrompt;
         /// Generates `best_of` completions server-side and returns the \"best\" (the one with the highest log probability per token). Results cannot be streamed.  When used with `n`, `best_of` controls the number of candidate completions and `n` specifies how many to return – `best_of` must be greater than `n`.  **Note:** Because this parameter generates many completions, it can quickly consume your token quota. Use carefully and ensure that you have reasonable settings for `max_tokens` and `stop`. 
         best_of : ?Nat;
         /// Echo back the prompt in addition to the completion 
@@ -55,7 +56,10 @@ module {
         public func toCandidValue(value : CreateCompletionRequest) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("model", CreateCompletionRequestModel.toCandidValue(value.model)));
-            List.add(buf, ("prompt", CreateCompletionRequestPrompt.toCandidValue(value.prompt)));
+            switch (value.prompt) {
+                case (?v__) List.add(buf, ("prompt", CreateCompletionRequestPrompt.toCandidValue(v__)));
+                case null ();
+            };
             switch (value.best_of) {
                 case (?v__) List.add(buf, ("best_of", #Nat(v__)));
                 case null ();
@@ -128,8 +132,10 @@ module {
                 case (#Record(fields)) {
                     let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = (CreateCompletionRequestModel.fromCandidValue(model_field.1)) else return null;
-                    let ?prompt_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt") else return null;
-                    let ?prompt = (CreateCompletionRequestPrompt.fromCandidValue(prompt_field.1)) else return null;
+                    let prompt : ?CreateCompletionRequestPrompt = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt")) {
+                        case (?prompt_field) (CreateCompletionRequestPrompt.fromCandidValue(prompt_field.1));
+                        case null null;
+                    };
                     let best_of : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "best_of")) {
                         case (?best_of_field) ((switch (best_of_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
@@ -139,7 +145,7 @@ module {
                         case null null;
                     };
                     let frequency_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "frequency_penalty")) {
-                        case (?frequency_penalty_field) ((switch (frequency_penalty_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?frequency_penalty_field) ((switch (frequency_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let logit_bias : ?Map<Text, Int> = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logit_bias")) {
@@ -147,7 +153,7 @@ module {
                         case (#Record(pairs__)) {
                             let buf__ = List.empty<(Text, Int)>();
                             for ((k__, c__) in pairs__.values()) {
-                                let #Int(v__) = c__ else return null;
+                                let ?v__ = (switch (c__) { case (#Int(j)) ?j; case (#Nat(k)) ?k; case _ null }) else return null;
                                 List.add(buf__, (k__, v__));
                             };
                             ?fromIter<Text, Int>(List.toArray(buf__).values(), Text.compare);
@@ -169,11 +175,11 @@ module {
                         case null null;
                     };
                     let presence_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "presence_penalty")) {
-                        case (?presence_penalty_field) ((switch (presence_penalty_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?presence_penalty_field) ((switch (presence_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let seed : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seed")) {
-                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let stop : ?StopConfiguration = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stop")) {
@@ -193,11 +199,11 @@ module {
                         case null null;
                     };
                     let temperature : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature")) {
-                        case (?temperature_field) ((switch (temperature_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?temperature_field) ((switch (temperature_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let top_p : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_p")) {
-                        case (?top_p_field) ((switch (top_p_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?top_p_field) ((switch (top_p_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {

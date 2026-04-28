@@ -4,6 +4,7 @@ import { type ChatCompletionRequestMessageContentPartText; JSON = ChatCompletion
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionRequestToolMessageContent.mo
 // oneOf<Text, [ChatCompletionRequestMessageContentPartText]> on the wire — emit as

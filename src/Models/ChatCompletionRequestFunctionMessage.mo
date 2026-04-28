@@ -3,6 +3,7 @@ import { type ChatCompletionRequestFunctionMessageRole; JSON = ChatCompletionReq
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionRequestFunctionMessage.mo
 
@@ -10,7 +11,7 @@ module {
     public type ChatCompletionRequestFunctionMessage = {
         role : ChatCompletionRequestFunctionMessageRole;
         /// The contents of the function message.
-        content : Text;
+        content : ?Text;
         /// The name of the function to call.
         name : Text;
     };
@@ -19,7 +20,10 @@ module {
         public func toCandidValue(value : ChatCompletionRequestFunctionMessage) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("role", ChatCompletionRequestFunctionMessageRole.toCandidValue(value.role)));
-            List.add(buf, ("content", #Text(value.content)));
+            switch (value.content) {
+                case (?v__) List.add(buf, ("content", #Text(v__)));
+                case null ();
+            };
             List.add(buf, ("name", #Text(value.name)));
             #Record(List.toArray(buf));
         };
@@ -29,8 +33,10 @@ module {
                 case (#Record(fields)) {
                     let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
                     let ?role = (ChatCompletionRequestFunctionMessageRole.fromCandidValue(role_field.1)) else return null;
-                    let ?content_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content") else return null;
-                    let ?content = ((switch (content_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                        case (?content_field) ((switch (content_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
                     let ?name_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
                     let ?name = ((switch (name_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{

@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateSpeechRequestResponseFormat.mo
 /// Enum values: #mp3, #opus, #aac, #flac, #wav, #pcm

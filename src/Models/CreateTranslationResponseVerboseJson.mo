@@ -3,6 +3,7 @@ import { type TranscriptionSegment; JSON = TranscriptionSegment } "./Transcripti
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateTranslationResponseVerboseJson.mo
 
@@ -37,7 +38,7 @@ module {
                     let ?language_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "language") else return null;
                     let ?language = ((switch (language_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     let ?duration_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "duration") else return null;
-                    let ?duration = ((switch (duration_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?duration = ((switch (duration_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     let segments : ?[TranscriptionSegment] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "segments")) {

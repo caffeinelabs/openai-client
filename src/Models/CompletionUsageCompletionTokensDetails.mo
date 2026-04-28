@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CompletionUsageCompletionTokensDetails.mo
 
@@ -43,19 +44,19 @@ module {
             switch (candid) {
                 case (#Record(fields)) {
                     let accepted_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "accepted_prediction_tokens")) {
-                        case (?accepted_prediction_tokens_field) ((switch (accepted_prediction_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?accepted_prediction_tokens_field) ((switch (accepted_prediction_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
-                        case (?audio_tokens_field) ((switch (audio_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?audio_tokens_field) ((switch (audio_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let reasoning_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "reasoning_tokens")) {
-                        case (?reasoning_tokens_field) ((switch (reasoning_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?reasoning_tokens_field) ((switch (reasoning_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let rejected_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "rejected_prediction_tokens")) {
-                        case (?rejected_prediction_tokens_field) ((switch (rejected_prediction_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?rejected_prediction_tokens_field) ((switch (rejected_prediction_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     ?{

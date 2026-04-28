@@ -33,6 +33,7 @@ import Text "mo:core/Text";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 import Int "mo:core/Int";
 
 // CreateChatCompletionRequest.mo
@@ -235,11 +236,11 @@ module {
                         case null null;
                     };
                     let temperature : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature")) {
-                        case (?temperature_field) ((switch (temperature_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?temperature_field) ((switch (temperature_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let top_p : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_p")) {
-                        case (?top_p_field) ((switch (top_p_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?top_p_field) ((switch (top_p_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
@@ -283,15 +284,15 @@ module {
                         case null null;
                     };
                     let max_completion_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "max_completion_tokens")) {
-                        case (?max_completion_tokens_field) ((switch (max_completion_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?max_completion_tokens_field) ((switch (max_completion_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let frequency_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "frequency_penalty")) {
-                        case (?frequency_penalty_field) ((switch (frequency_penalty_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?frequency_penalty_field) ((switch (frequency_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let presence_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "presence_penalty")) {
-                        case (?presence_penalty_field) ((switch (presence_penalty_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?presence_penalty_field) ((switch (presence_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let web_search_options : ?WebSearch = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "web_search_options")) {
@@ -327,7 +328,7 @@ module {
                         case (#Record(pairs__)) {
                             let buf__ = List.empty<(Text, Int)>();
                             for ((k__, c__) in pairs__.values()) {
-                                let #Int(v__) = c__ else return null;
+                                let ?v__ = (switch (c__) { case (#Int(j)) ?j; case (#Nat(k)) ?k; case _ null }) else return null;
                                 List.add(buf__, (k__, v__));
                             };
                             ?fromIter<Text, Int>(List.toArray(buf__).values(), Text.compare);
@@ -341,7 +342,7 @@ module {
                         case null null;
                     };
                     let max_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "max_tokens")) {
-                        case (?max_tokens_field) ((switch (max_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?max_tokens_field) ((switch (max_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let n : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "n")) {
@@ -353,7 +354,7 @@ module {
                         case null null;
                     };
                     let seed : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seed")) {
-                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let stream_options : ?ChatCompletionStreamOptions = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stream_options")) {

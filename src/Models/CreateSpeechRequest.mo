@@ -7,6 +7,7 @@ import { type VoiceIdsShared; JSON = VoiceIdsShared } "./VoiceIdsShared";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateSpeechRequest.mo
 
@@ -62,7 +63,7 @@ module {
                         case null null;
                     };
                     let speed : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "speed")) {
-                        case (?speed_field) ((switch (speed_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?speed_field) ((switch (speed_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     ?{

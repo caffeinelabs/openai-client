@@ -5,6 +5,7 @@ import { type CreateCompletionResponseChoicesInnerLogprobs; JSON = CreateComplet
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateCompletionResponseChoicesInner.mo
 
@@ -12,7 +13,7 @@ module {
     public type CreateCompletionResponseChoicesInner = {
         finish_reason : CreateCompletionResponseChoicesInnerFinishReason;
         index : Int;
-        logprobs : CreateCompletionResponseChoicesInnerLogprobs;
+        logprobs : ?CreateCompletionResponseChoicesInnerLogprobs;
         text_ : Text;
     };
 
@@ -21,7 +22,10 @@ module {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("finish_reason", CreateCompletionResponseChoicesInnerFinishReason.toCandidValue(value.finish_reason)));
             List.add(buf, ("index", #Int(value.index)));
-            List.add(buf, ("logprobs", CreateCompletionResponseChoicesInnerLogprobs.toCandidValue(value.logprobs)));
+            switch (value.logprobs) {
+                case (?v__) List.add(buf, ("logprobs", CreateCompletionResponseChoicesInnerLogprobs.toCandidValue(v__)));
+                case null ();
+            };
             List.add(buf, ("text", #Text(value.text_)));
             #Record(List.toArray(buf));
         };
@@ -32,9 +36,11 @@ module {
                     let ?finish_reason_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason") else return null;
                     let ?finish_reason = (CreateCompletionResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1)) else return null;
                     let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
-                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
-                    let ?logprobs_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs") else return null;
-                    let ?logprobs = (CreateCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1)) else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
+                    let logprobs : ?CreateCompletionResponseChoicesInnerLogprobs = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                        case (?logprobs_field) (CreateCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1));
+                        case null null;
+                    };
                     let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{

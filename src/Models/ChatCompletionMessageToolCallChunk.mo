@@ -5,6 +5,7 @@ import { type ChatCompletionMessageToolCallType; JSON = ChatCompletionMessageToo
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionMessageToolCallChunk.mo
 
@@ -40,7 +41,7 @@ module {
             switch (candid) {
                 case (#Record(fields)) {
                     let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
-                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let id : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id")) {
                         case (?id_field) ((switch (id_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;

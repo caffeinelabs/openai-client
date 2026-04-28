@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateImageRequestQuality.mo
 /// Enum values: #standard, #hd, #low, #medium, #high, #auto

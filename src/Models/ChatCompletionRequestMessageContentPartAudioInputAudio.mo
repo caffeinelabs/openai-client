@@ -3,6 +3,7 @@ import { type ChatCompletionRequestMessageContentPartAudioInputAudioFormat; JSON
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionRequestMessageContentPartAudioInputAudio.mo
 

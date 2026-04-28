@@ -6,6 +6,7 @@ import { type ImagesResponseUsage; JSON = ImagesResponseUsage } "./ImagesRespons
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ImagesResponse.mo
 
@@ -37,7 +38,7 @@ module {
             switch (candid) {
                 case (#Record(fields)) {
                     let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
-                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let data : ?[Image] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data")) {
                         case (?data_field) ((switch (data_field.1) {
                         case (#Array(xs__)) {

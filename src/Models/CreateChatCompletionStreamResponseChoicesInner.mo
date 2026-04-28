@@ -7,6 +7,7 @@ import { type CreateChatCompletionStreamResponseChoicesInnerFinishReason; JSON =
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateChatCompletionStreamResponseChoicesInner.mo
 
@@ -14,7 +15,7 @@ module {
     public type CreateChatCompletionStreamResponseChoicesInner = {
         delta : ChatCompletionStreamResponseDelta;
         logprobs : ?CreateChatCompletionResponseChoicesInnerLogprobs;
-        finish_reason : CreateChatCompletionStreamResponseChoicesInnerFinishReason;
+        finish_reason : ?CreateChatCompletionStreamResponseChoicesInnerFinishReason;
         /// The index of the choice in the list of choices.
         index : Int;
     };
@@ -27,7 +28,10 @@ module {
                 case (?v__) List.add(buf, ("logprobs", CreateChatCompletionResponseChoicesInnerLogprobs.toCandidValue(v__)));
                 case null ();
             };
-            List.add(buf, ("finish_reason", CreateChatCompletionStreamResponseChoicesInnerFinishReason.toCandidValue(value.finish_reason)));
+            switch (value.finish_reason) {
+                case (?v__) List.add(buf, ("finish_reason", CreateChatCompletionStreamResponseChoicesInnerFinishReason.toCandidValue(v__)));
+                case null ();
+            };
             List.add(buf, ("index", #Int(value.index)));
             #Record(List.toArray(buf));
         };
@@ -41,10 +45,12 @@ module {
                         case (?logprobs_field) (CreateChatCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1));
                         case null null;
                     };
-                    let ?finish_reason_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason") else return null;
-                    let ?finish_reason = (CreateChatCompletionStreamResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1)) else return null;
+                    let finish_reason : ?CreateChatCompletionStreamResponseChoicesInnerFinishReason = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason")) {
+                        case (?finish_reason_field) (CreateChatCompletionStreamResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1));
+                        case null null;
+                    };
                     let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
-                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     ?{
                         delta;
                         logprobs;

@@ -6,6 +6,7 @@ import { type ChatCompletionResponseMessageAnnotationsInnerUrlCitation; JSON = C
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // ChatCompletionResponseMessageAnnotationsInner.mo
 

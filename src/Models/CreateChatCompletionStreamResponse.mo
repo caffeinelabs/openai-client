@@ -10,6 +10,7 @@ import { type ServiceTier; JSON = ServiceTier } "./ServiceTier";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateChatCompletionStreamResponse.mo
 
@@ -71,7 +72,7 @@ module {
                         case _ null;
                     })) else return null;
                     let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
-                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = ((switch (model_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     let service_tier : ?ServiceTier = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "service_tier")) {

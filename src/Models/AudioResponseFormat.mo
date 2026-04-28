@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // AudioResponseFormat.mo
 /// Enum values: #json, #text_, #srt, #verbose_json, #vtt

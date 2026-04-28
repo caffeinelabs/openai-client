@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateChatCompletionStreamResponseChoicesInnerFinishReason.mo
 /// Enum values: #stop, #length, #tool_calls, #content_filter, #function_call

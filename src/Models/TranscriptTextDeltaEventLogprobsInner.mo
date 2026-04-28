@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // TranscriptTextDeltaEventLogprobsInner.mo
 
@@ -40,7 +41,7 @@ module {
                         case null null;
                     };
                     let logprob : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprob")) {
-                        case (?logprob_field) ((switch (logprob_field.1) { case (#Float(f)) ?f; case _ null }));
+                        case (?logprob_field) ((switch (logprob_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
                     let bytes : ?[Text] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes")) {

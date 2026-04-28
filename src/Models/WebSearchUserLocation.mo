@@ -4,6 +4,7 @@ import { type WebSearchLocation; JSON = WebSearchLocation } "./WebSearchLocation
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // WebSearchUserLocation.mo
 

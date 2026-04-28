@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner.mo
 /// Enum values: #text_, #image

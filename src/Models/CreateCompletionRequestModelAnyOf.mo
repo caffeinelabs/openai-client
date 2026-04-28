@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateCompletionRequestModelAnyOf.mo
 /// Enum values: #gpt_3_5_turbo_instruct, #davinci_002, #babbage_002

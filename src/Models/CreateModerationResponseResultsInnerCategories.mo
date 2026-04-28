@@ -2,6 +2,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // CreateModerationResponseResultsInnerCategories.mo
 
@@ -16,9 +17,9 @@ module {
         /// Harassment content that also includes violence or serious harm towards any target.
         harassment/threatening : Bool;
         /// Content that includes instructions or advice that facilitate the planning or execution of wrongdoing, or that gives advice or instruction on how to commit illicit acts. For example, \"how to shoplift\" would fit this category.
-        illicit : Bool;
+        illicit : ?Bool;
         /// Content that includes instructions or advice that facilitate the planning or execution of wrongdoing that also includes violence, or that gives advice or instruction on the procurement of any weapon.
-        illicit/violent : Bool;
+        illicit/violent : ?Bool;
         /// Content that promotes, encourages, or depicts acts of self-harm, such as suicide, cutting, and eating disorders.
         self_harm : Bool;
         /// Content where the speaker expresses that they are engaging or intend to engage in acts of self-harm, such as suicide, cutting, and eating disorders.
@@ -42,8 +43,14 @@ module {
             List.add(buf, ("hate/threatening", #Bool(value.hate/threatening)));
             List.add(buf, ("harassment", #Bool(value.harassment)));
             List.add(buf, ("harassment/threatening", #Bool(value.harassment/threatening)));
-            List.add(buf, ("illicit", #Bool(value.illicit)));
-            List.add(buf, ("illicit/violent", #Bool(value.illicit/violent)));
+            switch (value.illicit) {
+                case (?v__) List.add(buf, ("illicit", #Bool(v__)));
+                case null ();
+            };
+            switch (value.illicit/violent) {
+                case (?v__) List.add(buf, ("illicit/violent", #Bool(v__)));
+                case null ();
+            };
             List.add(buf, ("self-harm", #Bool(value.self_harm)));
             List.add(buf, ("self-harm/intent", #Bool(value.self_harm/intent)));
             List.add(buf, ("self-harm/instructions", #Bool(value.self_harm/instructions)));
@@ -65,10 +72,14 @@ module {
                     let ?harassment = ((switch (harassment_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
                     let ?harassment/threatening_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment/threatening") else return null;
                     let ?harassment/threatening = ((switch (harassment/threatening_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?illicit_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit") else return null;
-                    let ?illicit = ((switch (illicit_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?illicit/violent_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit/violent") else return null;
-                    let ?illicit/violent = ((switch (illicit/violent_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
+                    let illicit : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit")) {
+                        case (?illicit_field) ((switch (illicit_field.1) { case (#Bool(b)) ?b; case _ null }));
+                        case null null;
+                    };
+                    let illicit/violent : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit/violent")) {
+                        case (?illicit/violent_field) ((switch (illicit/violent_field.1) { case (#Bool(b)) ?b; case _ null }));
+                        case null null;
+                    };
                     let ?self_harm_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm") else return null;
                     let ?self_harm = ((switch (self_harm_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
                     let ?self_harm/intent_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/intent") else return null;

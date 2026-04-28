@@ -4,6 +4,25 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.2) — 2026-04-28
+
+### Fixed
+
+- **Numeric tolerance on decode**: `serde-core`'s JSON parser produces
+  `#Nat` for non-negative numbers and `#Int` only for negatives.
+  `fromCandidValue` for `Int` fields previously matched only `#Int(i)`,
+  so a positive timestamp like `created: 1777356890` failed to decode
+  → entire response decode bubbled up null → "Failed to convert response
+  to CreateChatCompletionResponse" despite a perfectly valid HTTP 200.
+  Now tolerant: `Int` accepts both `#Int` and `#Nat`; `Float` accepts
+  `#Float`, `#Int`, and `#Nat` (converting via `Float.fromInt`).
+
+- **`nullable: true` honoured**: a property with `required: true` *and*
+  `nullable: true` (e.g. `choices[].logprobs` in chat completions) is
+  now demoted to `?T` in the user-facing record type. The wire form
+  `"logprobs": null` is what OpenAI actually sends — required-but-null
+  used to trip the model decoder.
+
 ## [0.2.1](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.1) — 2026-04-28
 
 ### Fixed

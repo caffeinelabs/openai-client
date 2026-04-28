@@ -4,6 +4,7 @@ import { type EmbeddingObject; JSON = EmbeddingObject } "./EmbeddingObject";
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // Embedding.mo
 
@@ -29,13 +30,13 @@ module {
             switch (candid) {
                 case (#Record(fields)) {
                     let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
-                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let ?embedding_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "embedding") else return null;
                     let ?embedding = ((switch (embedding_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Float>();
                             for (c__ in xs__.values()) {
-                                let #Float(f__) = c__ else return null;
+                                let ?f__ = (switch (c__) { case (#Float(g)) ?g; case (#Int(j)) ?Float.fromInt(j); case (#Nat(k)) ?Float.fromInt(k); case _ null }) else return null;
                                 List.add(buf__, f__);
                             };
                             ?List.toArray(buf__);

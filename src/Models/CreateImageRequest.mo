@@ -17,6 +17,7 @@ import { type CreateImageRequestStyle; JSON = CreateImageRequestStyle } "./Creat
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 import Int "mo:core/Int";
 
 // CreateImageRequest.mo
@@ -118,7 +119,7 @@ module {
                         case null null;
                     };
                     let output_compression : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_compression")) {
-                        case (?output_compression_field) ((switch (output_compression_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case (?output_compression_field) ((switch (output_compression_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let size : ?CreateImageRequestSize = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "size")) {

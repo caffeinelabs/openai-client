@@ -1,6 +1,7 @@
 import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
+import Float "mo:core/Float";
 
 // TranscriptionSegment.mo
 
@@ -48,13 +49,13 @@ module {
             switch (candid) {
                 case (#Record(fields)) {
                     let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
-                    let ?id = ((switch (id_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?id = ((switch (id_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let ?seek_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seek") else return null;
-                    let ?seek = ((switch (seek_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?seek = ((switch (seek_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     let ?start_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start") else return null;
-                    let ?start = ((switch (start_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?start = ((switch (start_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?end_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end") else return null;
-                    let ?end = ((switch (end_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?end = ((switch (end_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     let ?tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tokens") else return null;
@@ -62,7 +63,7 @@ module {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Int>();
                             for (c__ in xs__.values()) {
-                                let #Int(i__) = c__ else return null;
+                                let ?i__ = (switch (c__) { case (#Int(j)) ?j; case (#Nat(k)) ?k; case _ null }) else return null;
                                 List.add(buf__, i__);
                             };
                             ?List.toArray(buf__);
@@ -70,13 +71,13 @@ module {
                         case _ null;
                     })) else return null;
                     let ?temperature_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature") else return null;
-                    let ?temperature = ((switch (temperature_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?temperature = ((switch (temperature_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?avg_logprob_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "avg_logprob") else return null;
-                    let ?avg_logprob = ((switch (avg_logprob_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?avg_logprob = ((switch (avg_logprob_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?compression_ratio_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "compression_ratio") else return null;
-                    let ?compression_ratio = ((switch (compression_ratio_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?compression_ratio = ((switch (compression_ratio_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     let ?no_speech_prob_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "no_speech_prob") else return null;
-                    let ?no_speech_prob = ((switch (no_speech_prob_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?no_speech_prob = ((switch (no_speech_prob_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     ?{
                         id;
                         seek;
