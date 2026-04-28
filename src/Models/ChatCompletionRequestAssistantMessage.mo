@@ -9,11 +9,13 @@ import { type ChatCompletionRequestAssistantMessageContent; JSON = ChatCompletio
 import { type ChatCompletionRequestAssistantMessageFunctionCall; JSON = ChatCompletionRequestAssistantMessageFunctionCall } "./ChatCompletionRequestAssistantMessageFunctionCall";
 
 import { type ChatCompletionRequestAssistantMessageRole; JSON = ChatCompletionRequestAssistantMessageRole } "./ChatCompletionRequestAssistantMessageRole";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestAssistantMessage.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionRequestAssistantMessage = {
         content : ?ChatCompletionRequestAssistantMessageContent;
         /// The refusal message by the assistant.
@@ -27,36 +29,87 @@ module {
         function_call : ?ChatCompletionRequestAssistantMessageFunctionCall;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestAssistantMessage type
-        public type JSON = {
-            content : ?ChatCompletionRequestAssistantMessageContent;
-            refusal : ?Text;
-            role : ChatCompletionRequestAssistantMessageRole.JSON;
-            name : ?Text;
-            audio : ?ChatCompletionRequestAssistantMessageAudio;
-            tool_calls : ?[ChatCompletionMessageToolCall];
-            function_call : ?ChatCompletionRequestAssistantMessageFunctionCall;
+        public func toCandidValue(value : ChatCompletionRequestAssistantMessage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.content) {
+                case (?v__) List.add(buf, ("content", ChatCompletionRequestAssistantMessageContent.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.refusal) {
+                case (?v__) List.add(buf, ("refusal", #Text(v__)));
+                case null ();
+            };
+            List.add(buf, ("role", ChatCompletionRequestAssistantMessageRole.toCandidValue(value.role)));
+            switch (value.name) {
+                case (?v__) List.add(buf, ("name", #Text(v__)));
+                case null ();
+            };
+            switch (value.audio) {
+                case (?v__) List.add(buf, ("audio", ChatCompletionRequestAssistantMessageAudio.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.tool_calls) {
+                case (?v__) List.add(buf, ("tool_calls", #Array(Array.map<ChatCompletionMessageToolCall, Candid.Candid>(v__, ChatCompletionMessageToolCall.toCandidValue))));
+                case null ();
+            };
+            switch (value.function_call) {
+                case (?v__) List.add(buf, ("function_call", ChatCompletionRequestAssistantMessageFunctionCall.toCandidValue(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestAssistantMessage) : JSON = { value with
-            role = ChatCompletionRequestAssistantMessageRole.toJSON(value.role);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestAssistantMessage {
-            let ?role = ChatCompletionRequestAssistantMessageRole.fromJSON(json.role) else return null;
-            ?{ json with
-                role;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionRequestAssistantMessage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestAssistantMessage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let content : ?ChatCompletionRequestAssistantMessageContent = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                        case (?content_field) (ChatCompletionRequestAssistantMessageContent.fromCandidValue(content_field.1));
+                        case null null;
+                    };
+                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
+                        case (?refusal_field) ((switch (refusal_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                    let ?role = (ChatCompletionRequestAssistantMessageRole.fromCandidValue(role_field.1)) else return null;
+                    let name : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name")) {
+                        case (?name_field) ((switch (name_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let audio : ?ChatCompletionRequestAssistantMessageAudio = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio")) {
+                        case (?audio_field) (ChatCompletionRequestAssistantMessageAudio.fromCandidValue(audio_field.1));
+                        case null null;
+                    };
+                    let tool_calls : ?[ChatCompletionMessageToolCall] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
+                        case (?tool_calls_field) ((switch (tool_calls_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<ChatCompletionMessageToolCall>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = ChatCompletionMessageToolCall.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    let function_call : ?ChatCompletionRequestAssistantMessageFunctionCall = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
+                        case (?function_call_field) (ChatCompletionRequestAssistantMessageFunctionCall.fromCandidValue(function_call_field.1));
+                        case null null;
+                    };
+                    ?{
+                        content;
+                        refusal;
+                        role;
+                        name;
+                        audio;
+                        tool_calls;
+                        function_call;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

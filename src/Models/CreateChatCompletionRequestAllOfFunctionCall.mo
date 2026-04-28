@@ -3,49 +3,50 @@
 import { type ChatCompletionFunctionCallOption; JSON = ChatCompletionFunctionCallOption } "./ChatCompletionFunctionCallOption";
 
 import { type CreateChatCompletionRequestAllOfFunctionCallOneOf; JSON = CreateChatCompletionRequestAllOfFunctionCallOneOf } "./CreateChatCompletionRequestAllOfFunctionCallOneOf";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateChatCompletionRequestAllOfFunctionCall.mo
+// Generic oneOf (no discriminator, no flatten) — wire form is `{"#tag": ...}`.
 import Runtime "mo:core/Runtime";
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type CreateChatCompletionRequestAllOfFunctionCall = {
         #CreateChatCompletionRequestAllOfFunctionCallOneOf : CreateChatCompletionRequestAllOfFunctionCallOneOf;
         #ChatCompletionFunctionCallOption : ChatCompletionFunctionCallOption;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
         // Convert oneOf variant to Text for URL parameters
         public func toText(value : CreateChatCompletionRequestAllOfFunctionCall) : Text =
             switch (value) {
-                case (#CreateChatCompletionRequestAllOfFunctionCallOneOf(v)) CreateChatCompletionRequestAllOfFunctionCallOneOf.toJSON(v);
+                case (#CreateChatCompletionRequestAllOfFunctionCallOneOf(v)) (switch (CreateChatCompletionRequestAllOfFunctionCallOneOf.toCandidValue(v)) { case (#Text(s)) s; case _ Runtime.unreachable() });
                 case (#ChatCompletionFunctionCallOption(v)) Runtime.unreachable();
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateChatCompletionRequestAllOfFunctionCall type
-        public type JSON = {
-            #CreateChatCompletionRequestAllOfFunctionCallOneOf : CreateChatCompletionRequestAllOfFunctionCallOneOf;
-            #ChatCompletionFunctionCallOption : ChatCompletionFunctionCallOption;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateChatCompletionRequestAllOfFunctionCall) : JSON =
+        public func toCandidValue(value : CreateChatCompletionRequestAllOfFunctionCall) : Candid.Candid =
             switch (value) {
-                case (#CreateChatCompletionRequestAllOfFunctionCallOneOf(v)) #CreateChatCompletionRequestAllOfFunctionCallOneOf(v);
-                case (#ChatCompletionFunctionCallOption(v)) #ChatCompletionFunctionCallOption(v);
+                case (#CreateChatCompletionRequestAllOfFunctionCallOneOf(v)) #Variant(("CreateChatCompletionRequestAllOfFunctionCallOneOf", CreateChatCompletionRequestAllOfFunctionCallOneOf.toCandidValue(v)));
+                case (#ChatCompletionFunctionCallOption(v)) #Variant(("ChatCompletionFunctionCallOption", ChatCompletionFunctionCallOption.toCandidValue(v)));
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateChatCompletionRequestAllOfFunctionCall =
-            switch (json) {
-                case (#CreateChatCompletionRequestAllOfFunctionCallOneOf(v)) ?#CreateChatCompletionRequestAllOfFunctionCallOneOf(v);
-                case (#ChatCompletionFunctionCallOption(v)) ?#ChatCompletionFunctionCallOption(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionRequestAllOfFunctionCall =
+            switch (candid) {
+                case (#Variant(tagAndVal)) {
+                    switch (tagAndVal.0) {
+                        case ("CreateChatCompletionRequestAllOfFunctionCallOneOf") {
+                            let ?inner = CreateChatCompletionRequestAllOfFunctionCallOneOf.fromCandidValue(tagAndVal.1) else return null;
+                            ?#CreateChatCompletionRequestAllOfFunctionCallOneOf(inner)
+                        };
+                        case ("ChatCompletionFunctionCallOption") {
+                            let ?inner = ChatCompletionFunctionCallOption.fromCandidValue(tagAndVal.1) else return null;
+                            ?#ChatCompletionFunctionCallOption(inner)
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : CreateChatCompletionRequestAllOfFunctionCall) : ?Text = null;
-    }
-}
+    };
+};

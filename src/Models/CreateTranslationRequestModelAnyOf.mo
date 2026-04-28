@@ -1,33 +1,30 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranslationRequestModelAnyOf.mo
 /// Enum values: #whisper_1
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateTranslationRequestModelAnyOf = {
         #whisper_1;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranslationRequestModelAnyOf type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranslationRequestModelAnyOf) : JSON =
+        public func toCandidValue(value : CreateTranslationRequestModelAnyOf) : Candid.Candid =
             switch (value) {
-                case (#whisper_1) "whisper-1";
+                case (#whisper_1) #Text("whisper-1");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranslationRequestModelAnyOf =
-            switch (json) {
-                case "whisper-1" ?#whisper_1;
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranslationRequestModelAnyOf =
+            switch (candid) {
+                case (#Text("whisper-1")) ?#whisper_1;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateTranslationRequestModelAnyOf) : ?Text = null;
-    }
-}
+        public func toText(value : CreateTranslationRequestModelAnyOf) : Text =
+            switch (value) {
+                case (#whisper_1) "whisper-1";
+            };
+    };
+};

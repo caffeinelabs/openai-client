@@ -1,39 +1,38 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscriptionRequestModelAnyOf.mo
 /// Enum values: #whisper_1, #gpt_4o_transcribe, #gpt_4o_mini_transcribe
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateTranscriptionRequestModelAnyOf = {
         #whisper_1;
         #gpt_4o_transcribe;
         #gpt_4o_mini_transcribe;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranscriptionRequestModelAnyOf type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateTranscriptionRequestModelAnyOf) : Candid.Candid =
+            switch (value) {
+                case (#whisper_1) #Text("whisper-1");
+                case (#gpt_4o_transcribe) #Text("gpt-4o-transcribe");
+                case (#gpt_4o_mini_transcribe) #Text("gpt-4o-mini-transcribe");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranscriptionRequestModelAnyOf) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionRequestModelAnyOf =
+            switch (candid) {
+                case (#Text("whisper-1")) ?#whisper_1;
+                case (#Text("gpt-4o-transcribe")) ?#gpt_4o_transcribe;
+                case (#Text("gpt-4o-mini-transcribe")) ?#gpt_4o_mini_transcribe;
+                case _ null;
+            };
+
+        public func toText(value : CreateTranscriptionRequestModelAnyOf) : Text =
             switch (value) {
                 case (#whisper_1) "whisper-1";
                 case (#gpt_4o_transcribe) "gpt-4o-transcribe";
                 case (#gpt_4o_mini_transcribe) "gpt-4o-mini-transcribe";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranscriptionRequestModelAnyOf =
-            switch (json) {
-                case "whisper-1" ?#whisper_1;
-                case "gpt-4o-transcribe" ?#gpt_4o_transcribe;
-                case "gpt-4o-mini-transcribe" ?#gpt_4o_mini_transcribe;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateTranscriptionRequestModelAnyOf) : ?Text = null;
-    }
-}
+    };
+};

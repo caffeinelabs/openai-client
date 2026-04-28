@@ -1,9 +1,12 @@
-import { type Map } "mo:core/pure/Map";
+import { type Map; entries; fromIter } "mo:core/pure/Map";
+import Text "mo:core/Text";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionFunctions.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionFunctions = {
         /// A description of what the function does, used by the model to choose when and how to call the function.
         description : ?Text;
@@ -13,25 +16,51 @@ module {
         parameters : ?Map<Text, Text>;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionFunctions type
-        public type JSON = {
-            description : ?Text;
-            name : Text;
-            parameters : ?Map<Text, Text>;
+        public func toCandidValue(value : ChatCompletionFunctions) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.description) {
+                case (?v__) List.add(buf, ("description", #Text(v__)));
+                case null ();
+            };
+            List.add(buf, ("name", #Text(value.name)));
+            switch (value.parameters) {
+                case (?v__) List.add(buf, ("parameters", #Record(Array.map<(Text, Text), (Text, Candid.Candid)>(Array.fromIter(entries(v__)), func((k, v) : (Text, Text)) : (Text, Candid.Candid) = (k, #Text(v))))));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionFunctions) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionFunctions = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionFunctions) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionFunctions =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let description : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "description")) {
+                        case (?description_field) ((switch (description_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let ?name_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
+                    let ?name = ((switch (name_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let parameters : ?Map<Text, Text> = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "parameters")) {
+                        case (?parameters_field) ((switch (parameters_field.1) {
+                        case (#Record(pairs__)) {
+                            let buf__ = List.empty<(Text, Text)>();
+                            for ((k__, c__) in pairs__.values()) {
+                                let #Text(v__) = c__ else return null;
+                                List.add(buf__, (k__, v__));
+                            };
+                            ?fromIter<Text, Text>(List.toArray(buf__).values(), Text.compare);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    ?{
+                        description;
+                        name;
+                        parameters;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

@@ -1,11 +1,13 @@
 /// For `gpt-image-1` only, the token usage information for the image generation. 
 
 import { type ImagesResponseUsageInputTokensDetails; JSON = ImagesResponseUsageInputTokensDetails } "./ImagesResponseUsageInputTokensDetails";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ImagesResponseUsage.mo
 
 module {
-    // User-facing type: what application code uses
     public type ImagesResponseUsage = {
         /// The total number of tokens (images and text) used for the image generation.
         total_tokens : Int;
@@ -16,26 +18,35 @@ module {
         input_tokens_details : ImagesResponseUsageInputTokensDetails;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ImagesResponseUsage type
-        public type JSON = {
-            total_tokens : Int;
-            input_tokens : Int;
-            output_tokens : Int;
-            input_tokens_details : ImagesResponseUsageInputTokensDetails;
+        public func toCandidValue(value : ImagesResponseUsage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("total_tokens", #Int(value.total_tokens)));
+            List.add(buf, ("input_tokens", #Int(value.input_tokens)));
+            List.add(buf, ("output_tokens", #Int(value.output_tokens)));
+            List.add(buf, ("input_tokens_details", ImagesResponseUsageInputTokensDetails.toCandidValue(value.input_tokens_details)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ImagesResponseUsage) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ImagesResponseUsage = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ImagesResponseUsage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ImagesResponseUsage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
+                    let ?total_tokens = ((switch (total_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?input_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens") else return null;
+                    let ?input_tokens = ((switch (input_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?output_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_tokens") else return null;
+                    let ?output_tokens = ((switch (output_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?input_tokens_details_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens_details") else return null;
+                    let ?input_tokens_details = (ImagesResponseUsageInputTokensDetails.fromCandidValue(input_tokens_details_field.1)) else return null;
+                    ?{
+                        total_tokens;
+                        input_tokens;
+                        output_tokens;
+                        input_tokens_details;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

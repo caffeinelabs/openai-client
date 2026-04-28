@@ -1,9 +1,11 @@
 /// The usage information for the request.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateEmbeddingResponseUsage.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateEmbeddingResponseUsage = {
         /// The number of tokens used by the prompt.
         prompt_tokens : Int;
@@ -11,24 +13,27 @@ module {
         total_tokens : Int;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateEmbeddingResponseUsage type
-        public type JSON = {
-            prompt_tokens : Int;
-            total_tokens : Int;
+        public func toCandidValue(value : CreateEmbeddingResponseUsage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("prompt_tokens", #Int(value.prompt_tokens)));
+            List.add(buf, ("total_tokens", #Int(value.total_tokens)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateEmbeddingResponseUsage) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateEmbeddingResponseUsage = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateEmbeddingResponseUsage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateEmbeddingResponseUsage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?prompt_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens") else return null;
+                    let ?prompt_tokens = ((switch (prompt_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
+                    let ?total_tokens = ((switch (total_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    ?{
+                        prompt_tokens;
+                        total_tokens;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

@@ -1,33 +1,41 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // DeleteModelResponse.mo
 
 module {
-    // User-facing type: what application code uses
     public type DeleteModelResponse = {
         id : Text;
         deleted : Bool;
         object_ : Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer DeleteModelResponse type
-        public type JSON = {
-            id : Text;
-            deleted : Bool;
-            object_ : Text;
+        public func toCandidValue(value : DeleteModelResponse) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("id", #Text(value.id)));
+            List.add(buf, ("deleted", #Bool(value.deleted)));
+            List.add(buf, ("object", #Text(value.object_)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : DeleteModelResponse) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?DeleteModelResponse = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : DeleteModelResponse) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?DeleteModelResponse =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?deleted_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "deleted") else return null;
+                    let ?deleted = ((switch (deleted_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object_ = ((switch (object__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    ?{
+                        id;
+                        deleted;
+                        object_;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

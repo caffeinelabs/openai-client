@@ -1,10 +1,12 @@
 /// The format to audio in. Supported formats are `mp3`, `opus`, `aac`, `flac`, `wav`, and `pcm`.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateSpeechRequestResponseFormat.mo
 /// Enum values: #mp3, #opus, #aac, #flac, #wav, #pcm
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateSpeechRequestResponseFormat = {
         #mp3;
         #opus;
@@ -14,14 +16,29 @@ module {
         #pcm;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateSpeechRequestResponseFormat type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateSpeechRequestResponseFormat) : Candid.Candid =
+            switch (value) {
+                case (#mp3) #Text("mp3");
+                case (#opus) #Text("opus");
+                case (#aac) #Text("aac");
+                case (#flac) #Text("flac");
+                case (#wav) #Text("wav");
+                case (#pcm) #Text("pcm");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateSpeechRequestResponseFormat) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateSpeechRequestResponseFormat =
+            switch (candid) {
+                case (#Text("mp3")) ?#mp3;
+                case (#Text("opus")) ?#opus;
+                case (#Text("aac")) ?#aac;
+                case (#Text("flac")) ?#flac;
+                case (#Text("wav")) ?#wav;
+                case (#Text("pcm")) ?#pcm;
+                case _ null;
+            };
+
+        public func toText(value : CreateSpeechRequestResponseFormat) : Text =
             switch (value) {
                 case (#mp3) "mp3";
                 case (#opus) "opus";
@@ -30,20 +47,5 @@ module {
                 case (#wav) "wav";
                 case (#pcm) "pcm";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateSpeechRequestResponseFormat =
-            switch (json) {
-                case "mp3" ?#mp3;
-                case "opus" ?#opus;
-                case "aac" ?#aac;
-                case "flac" ?#flac;
-                case "wav" ?#wav;
-                case "pcm" ?#pcm;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateSpeechRequestResponseFormat) : ?Text = null;
-    }
-}
+    };
+};

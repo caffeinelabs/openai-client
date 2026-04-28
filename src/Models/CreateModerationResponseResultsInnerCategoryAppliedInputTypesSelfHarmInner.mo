@@ -1,36 +1,34 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner.mo
 /// Enum values: #text_, #image
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner = {
         #text_;
         #image;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner) : Candid.Candid =
+            switch (value) {
+                case (#text_) #Text("text");
+                case (#image) #Text("image");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner =
+            switch (candid) {
+                case (#Text("text")) ?#text_;
+                case (#Text("image")) ?#image;
+                case _ null;
+            };
+
+        public func toText(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner) : Text =
             switch (value) {
                 case (#text_) "text";
                 case (#image) "image";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner =
-            switch (json) {
-                case "text" ?#text_;
-                case "image" ?#image;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesSelfHarmInner) : ?Text = null;
-    }
-}
+    };
+};

@@ -1,20 +1,23 @@
 /// ID of the model to use. The options are `gpt-4o-transcribe`, `gpt-4o-mini-transcribe`, and `whisper-1` (which is powered by our open source Whisper V2 model). 
 
 import { type CreateTranscriptionRequestModelAnyOf; JSON = CreateTranscriptionRequestModelAnyOf } "./CreateTranscriptionRequestModelAnyOf";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscriptionRequestModel.mo
-// anyOf / oneOf where every branch produces a JSON string on the wire — flattened
-// to `Text` directly so `to_candid` doesn't wrap the value as `{"<tag>": …}`.
+// anyOf / oneOf where every branch produces a JSON string on the wire — flattened to `Text`.
 
 module {
     public type CreateTranscriptionRequestModel = Text;
 
     public module JSON {
-        public type JSON = Text;
-
-        public func toJSON(value : CreateTranscriptionRequestModel) : JSON = value;
-        public func fromJSON(json : JSON) : ?CreateTranscriptionRequestModel = ?json;
-
-        public func validate(_value : CreateTranscriptionRequestModel) : ?Text = null;
-    }
-}
+        public func toCandidValue(value : CreateTranscriptionRequestModel) : Candid.Candid = #Text(value);
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionRequestModel =
+            switch (candid) {
+                case (#Text(s)) ?s;
+                case _ null;
+            };
+        public func toText(value : CreateTranscriptionRequestModel) : Text = value;
+    };
+};

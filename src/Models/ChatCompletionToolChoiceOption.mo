@@ -7,49 +7,50 @@ import { type ChatCompletionMessageToolCallType; JSON = ChatCompletionMessageToo
 import { type ChatCompletionNamedToolChoice; JSON = ChatCompletionNamedToolChoice } "./ChatCompletionNamedToolChoice";
 
 import { type ChatCompletionToolChoiceOptionOneOf; JSON = ChatCompletionToolChoiceOptionOneOf } "./ChatCompletionToolChoiceOptionOneOf";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionToolChoiceOption.mo
+// Generic oneOf (no discriminator, no flatten) — wire form is `{"#tag": ...}`.
 import Runtime "mo:core/Runtime";
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type ChatCompletionToolChoiceOption = {
         #ChatCompletionToolChoiceOptionOneOf : ChatCompletionToolChoiceOptionOneOf;
         #ChatCompletionNamedToolChoice : ChatCompletionNamedToolChoice;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
         // Convert oneOf variant to Text for URL parameters
         public func toText(value : ChatCompletionToolChoiceOption) : Text =
             switch (value) {
-                case (#ChatCompletionToolChoiceOptionOneOf(v)) ChatCompletionToolChoiceOptionOneOf.toJSON(v);
+                case (#ChatCompletionToolChoiceOptionOneOf(v)) (switch (ChatCompletionToolChoiceOptionOneOf.toCandidValue(v)) { case (#Text(s)) s; case _ Runtime.unreachable() });
                 case (#ChatCompletionNamedToolChoice(v)) Runtime.unreachable();
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionToolChoiceOption type
-        public type JSON = {
-            #ChatCompletionToolChoiceOptionOneOf : ChatCompletionToolChoiceOptionOneOf;
-            #ChatCompletionNamedToolChoice : ChatCompletionNamedToolChoice;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionToolChoiceOption) : JSON =
+        public func toCandidValue(value : ChatCompletionToolChoiceOption) : Candid.Candid =
             switch (value) {
-                case (#ChatCompletionToolChoiceOptionOneOf(v)) #ChatCompletionToolChoiceOptionOneOf(v);
-                case (#ChatCompletionNamedToolChoice(v)) #ChatCompletionNamedToolChoice(v);
+                case (#ChatCompletionToolChoiceOptionOneOf(v)) #Variant(("ChatCompletionToolChoiceOptionOneOf", ChatCompletionToolChoiceOptionOneOf.toCandidValue(v)));
+                case (#ChatCompletionNamedToolChoice(v)) #Variant(("ChatCompletionNamedToolChoice", ChatCompletionNamedToolChoice.toCandidValue(v)));
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionToolChoiceOption =
-            switch (json) {
-                case (#ChatCompletionToolChoiceOptionOneOf(v)) ?#ChatCompletionToolChoiceOptionOneOf(v);
-                case (#ChatCompletionNamedToolChoice(v)) ?#ChatCompletionNamedToolChoice(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionToolChoiceOption =
+            switch (candid) {
+                case (#Variant(tagAndVal)) {
+                    switch (tagAndVal.0) {
+                        case ("ChatCompletionToolChoiceOptionOneOf") {
+                            let ?inner = ChatCompletionToolChoiceOptionOneOf.fromCandidValue(tagAndVal.1) else return null;
+                            ?#ChatCompletionToolChoiceOptionOneOf(inner)
+                        };
+                        case ("ChatCompletionNamedToolChoice") {
+                            let ?inner = ChatCompletionNamedToolChoice.fromCandidValue(tagAndVal.1) else return null;
+                            ?#ChatCompletionNamedToolChoice(inner)
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : ChatCompletionToolChoiceOption) : ?Text = null;
-    }
-}
+    };
+};

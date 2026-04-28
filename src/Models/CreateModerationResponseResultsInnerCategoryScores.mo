@@ -1,9 +1,11 @@
 /// A list of the categories along with their scores as predicted by model.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationResponseResultsInnerCategoryScores.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateModerationResponseResultsInnerCategoryScores = {
         /// The score for the category 'hate'.
         hate : Float;
@@ -33,35 +35,71 @@ module {
         violence/graphic : Float;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationResponseResultsInnerCategoryScores type
-        public type JSON = {
-            hate : Float;
-            hate/threatening : Float;
-            harassment : Float;
-            harassment/threatening : Float;
-            illicit : Float;
-            illicit/violent : Float;
-            self_harm : Float;
-            self_harm/intent : Float;
-            self_harm/instructions : Float;
-            sexual : Float;
-            sexual/minors : Float;
-            violence : Float;
-            violence/graphic : Float;
+        public func toCandidValue(value : CreateModerationResponseResultsInnerCategoryScores) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("hate", #Float(value.hate)));
+            List.add(buf, ("hate/threatening", #Float(value.hate/threatening)));
+            List.add(buf, ("harassment", #Float(value.harassment)));
+            List.add(buf, ("harassment/threatening", #Float(value.harassment/threatening)));
+            List.add(buf, ("illicit", #Float(value.illicit)));
+            List.add(buf, ("illicit/violent", #Float(value.illicit/violent)));
+            List.add(buf, ("self-harm", #Float(value.self_harm)));
+            List.add(buf, ("self-harm/intent", #Float(value.self_harm/intent)));
+            List.add(buf, ("self-harm/instructions", #Float(value.self_harm/instructions)));
+            List.add(buf, ("sexual", #Float(value.sexual)));
+            List.add(buf, ("sexual/minors", #Float(value.sexual/minors)));
+            List.add(buf, ("violence", #Float(value.violence)));
+            List.add(buf, ("violence/graphic", #Float(value.violence/graphic)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationResponseResultsInnerCategoryScores) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationResponseResultsInnerCategoryScores = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateModerationResponseResultsInnerCategoryScores) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponseResultsInnerCategoryScores =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?hate_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate") else return null;
+                    let ?hate = ((switch (hate_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?hate/threatening_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate/threatening") else return null;
+                    let ?hate/threatening = ((switch (hate/threatening_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?harassment_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment") else return null;
+                    let ?harassment = ((switch (harassment_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?harassment/threatening_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment/threatening") else return null;
+                    let ?harassment/threatening = ((switch (harassment/threatening_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?illicit_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit") else return null;
+                    let ?illicit = ((switch (illicit_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?illicit/violent_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit/violent") else return null;
+                    let ?illicit/violent = ((switch (illicit/violent_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?self_harm_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm") else return null;
+                    let ?self_harm = ((switch (self_harm_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?self_harm/intent_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/intent") else return null;
+                    let ?self_harm/intent = ((switch (self_harm/intent_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?self_harm/instructions_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/instructions") else return null;
+                    let ?self_harm/instructions = ((switch (self_harm/instructions_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?sexual_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual") else return null;
+                    let ?sexual = ((switch (sexual_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?sexual/minors_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual/minors") else return null;
+                    let ?sexual/minors = ((switch (sexual/minors_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?violence_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence") else return null;
+                    let ?violence = ((switch (violence_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?violence/graphic_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence/graphic") else return null;
+                    let ?violence/graphic = ((switch (violence/graphic_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    ?{
+                        hate;
+                        hate/threatening;
+                        harassment;
+                        harassment/threatening;
+                        illicit;
+                        illicit/violent;
+                        self_harm;
+                        self_harm/intent;
+                        self_harm/instructions;
+                        sexual;
+                        sexual/minors;
+                        violence;
+                        violence/graphic;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

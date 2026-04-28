@@ -3,44 +3,39 @@
 import { type ChatCompletionRequestMessageContentPartImageImageUrl; JSON = ChatCompletionRequestMessageContentPartImageImageUrl } "./ChatCompletionRequestMessageContentPartImageImageUrl";
 
 import { type ChatCompletionRequestMessageContentPartImageType; JSON = ChatCompletionRequestMessageContentPartImageType } "./ChatCompletionRequestMessageContentPartImageType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestMessageContentPartImage.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionRequestMessageContentPartImage = {
         type_ : ChatCompletionRequestMessageContentPartImageType;
         image_url : ChatCompletionRequestMessageContentPartImageImageUrl;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestMessageContentPartImage type
-        public type JSON = {
-            type_ : ChatCompletionRequestMessageContentPartImageType.JSON;
-            image_url : ChatCompletionRequestMessageContentPartImageImageUrl.JSON;
+        public func toCandidValue(value : ChatCompletionRequestMessageContentPartImage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", ChatCompletionRequestMessageContentPartImageType.toCandidValue(value.type_)));
+            List.add(buf, ("image_url", ChatCompletionRequestMessageContentPartImageImageUrl.toCandidValue(value.image_url)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestMessageContentPartImage) : JSON = {
-            type_ = ChatCompletionRequestMessageContentPartImageType.toJSON(value.type_);
-            image_url = ChatCompletionRequestMessageContentPartImageImageUrl.toJSON(value.image_url);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestMessageContentPartImage {
-            let ?type_ = ChatCompletionRequestMessageContentPartImageType.fromJSON(json.type_) else return null;
-            let ?image_url = ChatCompletionRequestMessageContentPartImageImageUrl.fromJSON(json.image_url) else return null;
-            ?{
-                type_;
-                image_url;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionRequestMessageContentPartImage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessageContentPartImage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (ChatCompletionRequestMessageContentPartImageType.fromCandidValue(type__field.1)) else return null;
+                    let ?image_url_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "image_url") else return null;
+                    let ?image_url = (ChatCompletionRequestMessageContentPartImageImageUrl.fromCandidValue(image_url_field.1)) else return null;
+                    ?{
+                        type_;
+                        image_url;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

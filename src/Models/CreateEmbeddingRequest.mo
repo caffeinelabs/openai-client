@@ -4,13 +4,14 @@ import { type CreateEmbeddingRequestEncodingFormat; JSON = CreateEmbeddingReques
 import { type CreateEmbeddingRequestInput; JSON = CreateEmbeddingRequestInput } "./CreateEmbeddingRequestInput";
 
 import { type CreateEmbeddingRequestModel; JSON = CreateEmbeddingRequestModel } "./CreateEmbeddingRequestModel";
-
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 import Int "mo:core/Int";
 
 // CreateEmbeddingRequest.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateEmbeddingRequest = {
         input : CreateEmbeddingRequestInput;
         model : CreateEmbeddingRequestModel;
@@ -21,34 +22,54 @@ module {
         user : ?Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateEmbeddingRequest type
-        public type JSON = {
-            input : CreateEmbeddingRequestInput;
-            model : CreateEmbeddingRequestModel;
-            encoding_format : ?CreateEmbeddingRequestEncodingFormat.JSON;
-            dimensions : ?Int;
-            user : ?Text;
+        public func toCandidValue(value : CreateEmbeddingRequest) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("input", CreateEmbeddingRequestInput.toCandidValue(value.input)));
+            List.add(buf, ("model", CreateEmbeddingRequestModel.toCandidValue(value.model)));
+            switch (value.encoding_format) {
+                case (?v__) List.add(buf, ("encoding_format", CreateEmbeddingRequestEncodingFormat.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.dimensions) {
+                case (?v__) List.add(buf, ("dimensions", #Nat(v__)));
+                case null ();
+            };
+            switch (value.user) {
+                case (?v__) List.add(buf, ("user", #Text(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateEmbeddingRequest) : JSON = { value with
-            encoding_format = do ? { CreateEmbeddingRequestEncodingFormat.toJSON(value.encoding_format!) };
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateEmbeddingRequest {
-            ?{ json with
-                encoding_format = do ? { CreateEmbeddingRequestEncodingFormat.fromJSON(json.encoding_format!)! };
-                dimensions = switch (json.dimensions) { case (?v) if (v < 0) null else ?Int.abs(v); case null null };
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateEmbeddingRequest) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateEmbeddingRequest =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?input_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
+                    let ?input = (CreateEmbeddingRequestInput.fromCandidValue(input_field.1)) else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model = (CreateEmbeddingRequestModel.fromCandidValue(model_field.1)) else return null;
+                    let encoding_format : ?CreateEmbeddingRequestEncodingFormat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "encoding_format")) {
+                        case (?encoding_format_field) (CreateEmbeddingRequestEncodingFormat.fromCandidValue(encoding_format_field.1));
+                        case null null;
+                    };
+                    let dimensions : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "dimensions")) {
+                        case (?dimensions_field) ((switch (dimensions_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
+                        case null null;
+                    };
+                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
+                        case (?user_field) ((switch (user_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        input;
+                        model;
+                        encoding_format;
+                        dimensions;
+                        user;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

@@ -1,19 +1,22 @@
 
 import { type ModelIdsSharedAnyOf; JSON = ModelIdsSharedAnyOf } "./ModelIdsSharedAnyOf";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ModelIdsShared.mo
-// anyOf / oneOf where every branch produces a JSON string on the wire — flattened
-// to `Text` directly so `to_candid` doesn't wrap the value as `{"<tag>": …}`.
+// anyOf / oneOf where every branch produces a JSON string on the wire — flattened to `Text`.
 
 module {
     public type ModelIdsShared = Text;
 
     public module JSON {
-        public type JSON = Text;
-
-        public func toJSON(value : ModelIdsShared) : JSON = value;
-        public func fromJSON(json : JSON) : ?ModelIdsShared = ?json;
-
-        public func validate(_value : ModelIdsShared) : ?Text = null;
-    }
-}
+        public func toCandidValue(value : ModelIdsShared) : Candid.Candid = #Text(value);
+        public func fromCandidValue(candid : Candid.Candid) : ?ModelIdsShared =
+            switch (candid) {
+                case (#Text(s)) ?s;
+                case _ null;
+            };
+        public func toText(value : ModelIdsShared) : Text = value;
+    };
+};

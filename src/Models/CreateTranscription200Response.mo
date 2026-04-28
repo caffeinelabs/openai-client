@@ -8,18 +8,20 @@ import { type CreateTranscriptionResponseVerboseJson; JSON = CreateTranscription
 import { type TranscriptionSegment; JSON = TranscriptionSegment } "./TranscriptionSegment";
 
 import { type TranscriptionWord; JSON = TranscriptionWord } "./TranscriptionWord";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscription200Response.mo
+// Generic oneOf (no discriminator, no flatten) — wire form is `{"#tag": ...}`.
 import Runtime "mo:core/Runtime";
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type CreateTranscription200Response = {
         #CreateTranscriptionResponseJson : CreateTranscriptionResponseJson;
         #CreateTranscriptionResponseVerboseJson : CreateTranscriptionResponseVerboseJson;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
         // Convert oneOf variant to Text for URL parameters
         public func toText(value : CreateTranscription200Response) : Text =
@@ -28,29 +30,28 @@ module {
                 case (#CreateTranscriptionResponseVerboseJson(v)) Runtime.unreachable();
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranscription200Response type
-        public type JSON = {
-            #CreateTranscriptionResponseJson : CreateTranscriptionResponseJson;
-            #CreateTranscriptionResponseVerboseJson : CreateTranscriptionResponseVerboseJson;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranscription200Response) : JSON =
+        public func toCandidValue(value : CreateTranscription200Response) : Candid.Candid =
             switch (value) {
-                case (#CreateTranscriptionResponseJson(v)) #CreateTranscriptionResponseJson(v);
-                case (#CreateTranscriptionResponseVerboseJson(v)) #CreateTranscriptionResponseVerboseJson(v);
+                case (#CreateTranscriptionResponseJson(v)) #Variant(("CreateTranscriptionResponseJson", CreateTranscriptionResponseJson.toCandidValue(v)));
+                case (#CreateTranscriptionResponseVerboseJson(v)) #Variant(("CreateTranscriptionResponseVerboseJson", CreateTranscriptionResponseVerboseJson.toCandidValue(v)));
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranscription200Response =
-            switch (json) {
-                case (#CreateTranscriptionResponseJson(v)) ?#CreateTranscriptionResponseJson(v);
-                case (#CreateTranscriptionResponseVerboseJson(v)) ?#CreateTranscriptionResponseVerboseJson(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscription200Response =
+            switch (candid) {
+                case (#Variant(tagAndVal)) {
+                    switch (tagAndVal.0) {
+                        case ("CreateTranscriptionResponseJson") {
+                            let ?inner = CreateTranscriptionResponseJson.fromCandidValue(tagAndVal.1) else return null;
+                            ?#CreateTranscriptionResponseJson(inner)
+                        };
+                        case ("CreateTranscriptionResponseVerboseJson") {
+                            let ?inner = CreateTranscriptionResponseVerboseJson.fromCandidValue(tagAndVal.1) else return null;
+                            ?#CreateTranscriptionResponseVerboseJson(inner)
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : CreateTranscription200Response) : ?Text = null;
-    }
-}
+    };
+};

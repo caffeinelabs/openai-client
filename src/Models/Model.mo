@@ -1,11 +1,13 @@
 /// Describes an OpenAI model offering that can be used with the API.
 
 import { type ModelObject; JSON = ModelObject } "./ModelObject";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // Model.mo
 
 module {
-    // User-facing type: what application code uses
     public type Model = {
         /// The model identifier, which can be referenced in the API endpoints.
         id : Text;
@@ -16,33 +18,35 @@ module {
         owned_by : Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer Model type
-        public type JSON = {
-            id : Text;
-            created : Int;
-            object_ : ModelObject.JSON;
-            owned_by : Text;
+        public func toCandidValue(value : Model) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("id", #Text(value.id)));
+            List.add(buf, ("created", #Int(value.created)));
+            List.add(buf, ("object", ModelObject.toCandidValue(value.object_)));
+            List.add(buf, ("owned_by", #Text(value.owned_by)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : Model) : JSON = { value with
-            object_ = ModelObject.toJSON(value.object_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?Model {
-            let ?object_ = ModelObject.fromJSON(json.object_) else return null;
-            ?{ json with
-                object_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : Model) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?Model =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
+                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object_ = (ModelObject.fromCandidValue(object__field.1)) else return null;
+                    let ?owned_by_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "owned_by") else return null;
+                    let ?owned_by = ((switch (owned_by_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    ?{
+                        id;
+                        created;
+                        object_;
+                        owned_by;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

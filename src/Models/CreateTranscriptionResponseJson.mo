@@ -1,11 +1,13 @@
 /// Represents a transcription response returned by model, based on the provided input.
 
 import { type CreateTranscriptionResponseJsonLogprobsInner; JSON = CreateTranscriptionResponseJsonLogprobsInner } "./CreateTranscriptionResponseJsonLogprobsInner";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscriptionResponseJson.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateTranscriptionResponseJson = {
         /// The transcribed text.
         text_ : Text;
@@ -13,24 +15,42 @@ module {
         logprobs : ?[CreateTranscriptionResponseJsonLogprobsInner];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranscriptionResponseJson type
-        public type JSON = {
-            text_ : Text;
-            logprobs : ?[CreateTranscriptionResponseJsonLogprobsInner];
+        public func toCandidValue(value : CreateTranscriptionResponseJson) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("text", #Text(value.text_)));
+            switch (value.logprobs) {
+                case (?v__) List.add(buf, ("logprobs", #Array(Array.map<CreateTranscriptionResponseJsonLogprobsInner, Candid.Candid>(v__, CreateTranscriptionResponseJsonLogprobsInner.toCandidValue))));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranscriptionResponseJson) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranscriptionResponseJson = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateTranscriptionResponseJson) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionResponseJson =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                    let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let logprobs : ?[CreateTranscriptionResponseJsonLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                        case (?logprobs_field) ((switch (logprobs_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<CreateTranscriptionResponseJsonLogprobsInner>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = CreateTranscriptionResponseJsonLogprobsInner.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    ?{
+                        text_;
+                        logprobs;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

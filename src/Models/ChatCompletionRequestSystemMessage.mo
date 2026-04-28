@@ -3,11 +3,13 @@
 import { type ChatCompletionRequestSystemMessageContent; JSON = ChatCompletionRequestSystemMessageContent } "./ChatCompletionRequestSystemMessageContent";
 
 import { type ChatCompletionRequestSystemMessageRole; JSON = ChatCompletionRequestSystemMessageRole } "./ChatCompletionRequestSystemMessageRole";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestSystemMessage.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionRequestSystemMessage = {
         content : ChatCompletionRequestSystemMessageContent;
         role : ChatCompletionRequestSystemMessageRole;
@@ -15,32 +17,36 @@ module {
         name : ?Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestSystemMessage type
-        public type JSON = {
-            content : ChatCompletionRequestSystemMessageContent;
-            role : ChatCompletionRequestSystemMessageRole.JSON;
-            name : ?Text;
+        public func toCandidValue(value : ChatCompletionRequestSystemMessage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("content", ChatCompletionRequestSystemMessageContent.toCandidValue(value.content)));
+            List.add(buf, ("role", ChatCompletionRequestSystemMessageRole.toCandidValue(value.role)));
+            switch (value.name) {
+                case (?v__) List.add(buf, ("name", #Text(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestSystemMessage) : JSON = { value with
-            role = ChatCompletionRequestSystemMessageRole.toJSON(value.role);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestSystemMessage {
-            let ?role = ChatCompletionRequestSystemMessageRole.fromJSON(json.role) else return null;
-            ?{ json with
-                role;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionRequestSystemMessage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestSystemMessage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?content_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content") else return null;
+                    let ?content = (ChatCompletionRequestSystemMessageContent.fromCandidValue(content_field.1)) else return null;
+                    let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                    let ?role = (ChatCompletionRequestSystemMessageRole.fromCandidValue(role_field.1)) else return null;
+                    let name : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name")) {
+                        case (?name_field) ((switch (name_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        content;
+                        role;
+                        name;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

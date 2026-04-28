@@ -3,11 +3,13 @@
 import { type ChatCompletionListObject; JSON = ChatCompletionListObject } "./ChatCompletionListObject";
 
 import { type CreateChatCompletionResponse; JSON = CreateChatCompletionResponse } "./CreateChatCompletionResponse";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionList.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionList = {
         object_ : ChatCompletionListObject;
         /// An array of chat completion objects. 
@@ -20,34 +22,49 @@ module {
         has_more : Bool;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionList type
-        public type JSON = {
-            object_ : ChatCompletionListObject.JSON;
-            data : [CreateChatCompletionResponse];
-            first_id : Text;
-            last_id : Text;
-            has_more : Bool;
+        public func toCandidValue(value : ChatCompletionList) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("object", ChatCompletionListObject.toCandidValue(value.object_)));
+            List.add(buf, ("data", #Array(Array.map<CreateChatCompletionResponse, Candid.Candid>(value.data, CreateChatCompletionResponse.toCandidValue))));
+            List.add(buf, ("first_id", #Text(value.first_id)));
+            List.add(buf, ("last_id", #Text(value.last_id)));
+            List.add(buf, ("has_more", #Bool(value.has_more)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionList) : JSON = { value with
-            object_ = ChatCompletionListObject.toJSON(value.object_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionList {
-            let ?object_ = ChatCompletionListObject.fromJSON(json.object_) else return null;
-            ?{ json with
-                object_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionList) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionList =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object_ = (ChatCompletionListObject.fromCandidValue(object__field.1)) else return null;
+                    let ?data_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
+                    let ?data = ((switch (data_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<CreateChatCompletionResponse>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = CreateChatCompletionResponse.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    })) else return null;
+                    let ?first_id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "first_id") else return null;
+                    let ?first_id = ((switch (first_id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?last_id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "last_id") else return null;
+                    let ?last_id = ((switch (last_id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?has_more_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "has_more") else return null;
+                    let ?has_more = ((switch (has_more_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
+                    ?{
+                        object_;
+                        data;
+                        first_id;
+                        last_id;
+                        has_more;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

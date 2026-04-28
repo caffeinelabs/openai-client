@@ -1,36 +1,34 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscriptionRequestTimestampGranularitiesInner.mo
 /// Enum values: #word, #segment
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateTranscriptionRequestTimestampGranularitiesInner = {
         #word;
         #segment;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranscriptionRequestTimestampGranularitiesInner type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateTranscriptionRequestTimestampGranularitiesInner) : Candid.Candid =
+            switch (value) {
+                case (#word) #Text("word");
+                case (#segment) #Text("segment");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranscriptionRequestTimestampGranularitiesInner) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionRequestTimestampGranularitiesInner =
+            switch (candid) {
+                case (#Text("word")) ?#word;
+                case (#Text("segment")) ?#segment;
+                case _ null;
+            };
+
+        public func toText(value : CreateTranscriptionRequestTimestampGranularitiesInner) : Text =
             switch (value) {
                 case (#word) "word";
                 case (#segment) "segment";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranscriptionRequestTimestampGranularitiesInner =
-            switch (json) {
-                case "word" ?#word;
-                case "segment" ?#segment;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateTranscriptionRequestTimestampGranularitiesInner) : ?Text = null;
-    }
-}
+    };
+};

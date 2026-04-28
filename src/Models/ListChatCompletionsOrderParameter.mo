@@ -1,36 +1,34 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ListChatCompletionsOrderParameter.mo
 /// Enum values: #asc, #desc
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ListChatCompletionsOrderParameter = {
         #asc;
         #desc;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ListChatCompletionsOrderParameter type
-        public type JSON = Text;
+        public func toCandidValue(value : ListChatCompletionsOrderParameter) : Candid.Candid =
+            switch (value) {
+                case (#asc) #Text("asc");
+                case (#desc) #Text("desc");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ListChatCompletionsOrderParameter) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?ListChatCompletionsOrderParameter =
+            switch (candid) {
+                case (#Text("asc")) ?#asc;
+                case (#Text("desc")) ?#desc;
+                case _ null;
+            };
+
+        public func toText(value : ListChatCompletionsOrderParameter) : Text =
             switch (value) {
                 case (#asc) "asc";
                 case (#desc) "desc";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ListChatCompletionsOrderParameter =
-            switch (json) {
-                case "asc" ?#asc;
-                case "desc" ?#desc;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ListChatCompletionsOrderParameter) : ?Text = null;
-    }
-}
+    };
+};

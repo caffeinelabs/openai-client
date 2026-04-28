@@ -1,36 +1,34 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateImageEditRequestModelAnyOf.mo
 /// Enum values: #dall_e_2, #gpt_image_1
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateImageEditRequestModelAnyOf = {
         #dall_e_2;
         #gpt_image_1;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateImageEditRequestModelAnyOf type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateImageEditRequestModelAnyOf) : Candid.Candid =
+            switch (value) {
+                case (#dall_e_2) #Text("dall-e-2");
+                case (#gpt_image_1) #Text("gpt-image-1");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateImageEditRequestModelAnyOf) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateImageEditRequestModelAnyOf =
+            switch (candid) {
+                case (#Text("dall-e-2")) ?#dall_e_2;
+                case (#Text("gpt-image-1")) ?#gpt_image_1;
+                case _ null;
+            };
+
+        public func toText(value : CreateImageEditRequestModelAnyOf) : Text =
             switch (value) {
                 case (#dall_e_2) "dall-e-2";
                 case (#gpt_image_1) "gpt-image-1";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateImageEditRequestModelAnyOf =
-            switch (json) {
-                case "dall-e-2" ?#dall_e_2;
-                case "gpt-image-1" ?#gpt_image_1;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateImageEditRequestModelAnyOf) : ?Text = null;
-    }
-}
+    };
+};

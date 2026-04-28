@@ -1,33 +1,30 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // DeleteFileResponseObject.mo
 /// Enum values: #file
 
 module {
-    // User-facing type: type-safe variants for application code
     public type DeleteFileResponseObject = {
         #file;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer DeleteFileResponseObject type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : DeleteFileResponseObject) : JSON =
+        public func toCandidValue(value : DeleteFileResponseObject) : Candid.Candid =
             switch (value) {
-                case (#file) "file";
+                case (#file) #Text("file");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?DeleteFileResponseObject =
-            switch (json) {
-                case "file" ?#file;
+        public func fromCandidValue(candid : Candid.Candid) : ?DeleteFileResponseObject =
+            switch (candid) {
+                case (#Text("file")) ?#file;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : DeleteFileResponseObject) : ?Text = null;
-    }
-}
+        public func toText(value : DeleteFileResponseObject) : Text =
+            switch (value) {
+                case (#file) "file";
+            };
+    };
+};

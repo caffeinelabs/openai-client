@@ -4,11 +4,13 @@ import { type ChatCompletionResponseMessage; JSON = ChatCompletionResponseMessag
 import { type CreateChatCompletionResponseChoicesInnerFinishReason; JSON = CreateChatCompletionResponseChoicesInnerFinishReason } "./CreateChatCompletionResponseChoicesInnerFinishReason";
 
 import { type CreateChatCompletionResponseChoicesInnerLogprobs; JSON = CreateChatCompletionResponseChoicesInnerLogprobs } "./CreateChatCompletionResponseChoicesInnerLogprobs";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateChatCompletionResponseChoicesInner.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateChatCompletionResponseChoicesInner = {
         finish_reason : CreateChatCompletionResponseChoicesInnerFinishReason;
         /// The index of the choice in the list of choices.
@@ -17,36 +19,35 @@ module {
         logprobs : CreateChatCompletionResponseChoicesInnerLogprobs;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateChatCompletionResponseChoicesInner type
-        public type JSON = {
-            finish_reason : CreateChatCompletionResponseChoicesInnerFinishReason.JSON;
-            index : Int;
-            message : ChatCompletionResponseMessage.JSON;
-            logprobs : CreateChatCompletionResponseChoicesInnerLogprobs;
+        public func toCandidValue(value : CreateChatCompletionResponseChoicesInner) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("finish_reason", CreateChatCompletionResponseChoicesInnerFinishReason.toCandidValue(value.finish_reason)));
+            List.add(buf, ("index", #Int(value.index)));
+            List.add(buf, ("message", ChatCompletionResponseMessage.toCandidValue(value.message)));
+            List.add(buf, ("logprobs", CreateChatCompletionResponseChoicesInnerLogprobs.toCandidValue(value.logprobs)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateChatCompletionResponseChoicesInner) : JSON = { value with
-            finish_reason = CreateChatCompletionResponseChoicesInnerFinishReason.toJSON(value.finish_reason);
-            message = ChatCompletionResponseMessage.toJSON(value.message);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateChatCompletionResponseChoicesInner {
-            let ?finish_reason = CreateChatCompletionResponseChoicesInnerFinishReason.fromJSON(json.finish_reason) else return null;
-            let ?message = ChatCompletionResponseMessage.fromJSON(json.message) else return null;
-            ?{ json with
-                finish_reason;
-                message;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateChatCompletionResponseChoicesInner) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionResponseChoicesInner =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?finish_reason_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason") else return null;
+                    let ?finish_reason = (CreateChatCompletionResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1)) else return null;
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?message_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "message") else return null;
+                    let ?message = (ChatCompletionResponseMessage.fromCandidValue(message_field.1)) else return null;
+                    let ?logprobs_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs") else return null;
+                    let ?logprobs = (CreateChatCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1)) else return null;
+                    ?{
+                        finish_reason;
+                        index;
+                        message;
+                        logprobs;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

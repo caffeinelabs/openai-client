@@ -1,36 +1,34 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionModalitiesInner.mo
 /// Enum values: #text_, #audio
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ChatCompletionModalitiesInner = {
         #text_;
         #audio;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionModalitiesInner type
-        public type JSON = Text;
+        public func toCandidValue(value : ChatCompletionModalitiesInner) : Candid.Candid =
+            switch (value) {
+                case (#text_) #Text("text");
+                case (#audio) #Text("audio");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionModalitiesInner) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionModalitiesInner =
+            switch (candid) {
+                case (#Text("text")) ?#text_;
+                case (#Text("audio")) ?#audio;
+                case _ null;
+            };
+
+        public func toText(value : ChatCompletionModalitiesInner) : Text =
             switch (value) {
                 case (#text_) "text";
                 case (#audio) "audio";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionModalitiesInner =
-            switch (json) {
-                case "text" ?#text_;
-                case "audio" ?#audio;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ChatCompletionModalitiesInner) : ?Text = null;
-    }
-}
+    };
+};

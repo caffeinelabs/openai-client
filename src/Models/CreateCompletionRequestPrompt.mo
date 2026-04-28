@@ -1,10 +1,13 @@
 /// The prompt(s) to generate completions for, encoded as a string, array of strings, array of tokens, or array of token arrays.  Note that <|endoftext|> is the document separator that the model sees during training, so if a prompt is not specified the model will generate as if from the beginning of a new document. 
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateCompletionRequestPrompt.mo
+// Generic oneOf (no discriminator, no flatten) — wire form is `{"#tag": ...}`.
 import Runtime "mo:core/Runtime";
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type CreateCompletionRequestPrompt = {
         #one_of_0 : Text;
         #one_of_1 : [Text];
@@ -12,7 +15,6 @@ module {
         #_[Int] : [[Int]];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
         // Convert oneOf variant to Text for URL parameters
         public func toText(value : CreateCompletionRequestPrompt) : Text =
@@ -23,35 +25,38 @@ module {
                 case (#_[Int](v)) Runtime.unreachable();
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateCompletionRequestPrompt type
-        public type JSON = {
-            #one_of_0 : Text;
-            #one_of_1 : [Text];
-            #one_of_2 : [Int];
-            #_[Int] : [[Int]];
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateCompletionRequestPrompt) : JSON =
+        public func toCandidValue(value : CreateCompletionRequestPrompt) : Candid.Candid =
             switch (value) {
-                case (#one_of_0(v)) #one_of_0(v);
-                case (#one_of_1(v)) #one_of_1(v);
-                case (#one_of_2(v)) #one_of_2(v);
-                case (#_[Int](v)) #_[Int](v);
+                case (#one_of_0(v)) #Variant(("one_of_0", Text.toCandidValue(v)));
+                case (#one_of_1(v)) #Variant(("one_of_1", [Text].toCandidValue(v)));
+                case (#one_of_2(v)) #Variant(("one_of_2", [Int].toCandidValue(v)));
+                case (#_[Int](v)) #Variant(("_[Int]", [[Int]].toCandidValue(v)));
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateCompletionRequestPrompt =
-            switch (json) {
-                case (#one_of_0(v)) ?#one_of_0(v);
-                case (#one_of_1(v)) ?#one_of_1(v);
-                case (#one_of_2(v)) ?#one_of_2(v);
-                case (#_[Int](v)) ?#_[Int](v);
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateCompletionRequestPrompt =
+            switch (candid) {
+                case (#Variant(tagAndVal)) {
+                    switch (tagAndVal.0) {
+                        case ("one_of_0") {
+                            let ?inner = Text.fromCandidValue(tagAndVal.1) else return null;
+                            ?#one_of_0(inner)
+                        };
+                        case ("one_of_1") {
+                            let ?inner = [Text].fromCandidValue(tagAndVal.1) else return null;
+                            ?#one_of_1(inner)
+                        };
+                        case ("one_of_2") {
+                            let ?inner = [Int].fromCandidValue(tagAndVal.1) else return null;
+                            ?#one_of_2(inner)
+                        };
+                        case ("_[Int]") {
+                            let ?inner = [[Int]].fromCandidValue(tagAndVal.1) else return null;
+                            ?#_[Int](inner)
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : CreateCompletionRequestPrompt) : ?Text = null;
-    }
-}
+    };
+};

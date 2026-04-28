@@ -2,11 +2,13 @@
 import { type ChatCompletionRequestToolMessageContent; JSON = ChatCompletionRequestToolMessageContent } "./ChatCompletionRequestToolMessageContent";
 
 import { type ChatCompletionRequestToolMessageRole; JSON = ChatCompletionRequestToolMessageRole } "./ChatCompletionRequestToolMessageRole";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestToolMessage.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionRequestToolMessage = {
         role : ChatCompletionRequestToolMessageRole;
         content : ChatCompletionRequestToolMessageContent;
@@ -14,32 +16,31 @@ module {
         tool_call_id : Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestToolMessage type
-        public type JSON = {
-            role : ChatCompletionRequestToolMessageRole.JSON;
-            content : ChatCompletionRequestToolMessageContent;
-            tool_call_id : Text;
+        public func toCandidValue(value : ChatCompletionRequestToolMessage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("role", ChatCompletionRequestToolMessageRole.toCandidValue(value.role)));
+            List.add(buf, ("content", ChatCompletionRequestToolMessageContent.toCandidValue(value.content)));
+            List.add(buf, ("tool_call_id", #Text(value.tool_call_id)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestToolMessage) : JSON = { value with
-            role = ChatCompletionRequestToolMessageRole.toJSON(value.role);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestToolMessage {
-            let ?role = ChatCompletionRequestToolMessageRole.fromJSON(json.role) else return null;
-            ?{ json with
-                role;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionRequestToolMessage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestToolMessage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                    let ?role = (ChatCompletionRequestToolMessageRole.fromCandidValue(role_field.1)) else return null;
+                    let ?content_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content") else return null;
+                    let ?content = (ChatCompletionRequestToolMessageContent.fromCandidValue(content_field.1)) else return null;
+                    let ?tool_call_id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_call_id") else return null;
+                    let ?tool_call_id = ((switch (tool_call_id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    ?{
+                        role;
+                        content;
+                        tool_call_id;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

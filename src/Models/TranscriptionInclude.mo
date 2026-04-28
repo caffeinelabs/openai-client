@@ -1,33 +1,30 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // TranscriptionInclude.mo
 /// Enum values: #logprobs
 
 module {
-    // User-facing type: type-safe variants for application code
     public type TranscriptionInclude = {
         #logprobs;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer TranscriptionInclude type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : TranscriptionInclude) : JSON =
+        public func toCandidValue(value : TranscriptionInclude) : Candid.Candid =
             switch (value) {
-                case (#logprobs) "logprobs";
+                case (#logprobs) #Text("logprobs");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?TranscriptionInclude =
-            switch (json) {
-                case "logprobs" ?#logprobs;
+        public func fromCandidValue(candid : Candid.Candid) : ?TranscriptionInclude =
+            switch (candid) {
+                case (#Text("logprobs")) ?#logprobs;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : TranscriptionInclude) : ?Text = null;
-    }
-}
+        public func toText(value : TranscriptionInclude) : Text =
+            switch (value) {
+                case (#logprobs) "logprobs";
+            };
+    };
+};

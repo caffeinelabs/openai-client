@@ -3,11 +3,13 @@
 import { type TranscriptionSegment; JSON = TranscriptionSegment } "./TranscriptionSegment";
 
 import { type TranscriptionWord; JSON = TranscriptionWord } "./TranscriptionWord";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranscriptionResponseVerboseJson.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateTranscriptionResponseVerboseJson = {
         /// The language of the input audio.
         language : Text;
@@ -21,27 +23,69 @@ module {
         segments : ?[TranscriptionSegment];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranscriptionResponseVerboseJson type
-        public type JSON = {
-            language : Text;
-            duration : Float;
-            text_ : Text;
-            words : ?[TranscriptionWord];
-            segments : ?[TranscriptionSegment];
+        public func toCandidValue(value : CreateTranscriptionResponseVerboseJson) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("language", #Text(value.language)));
+            List.add(buf, ("duration", #Float(value.duration)));
+            List.add(buf, ("text", #Text(value.text_)));
+            switch (value.words) {
+                case (?v__) List.add(buf, ("words", #Array(Array.map<TranscriptionWord, Candid.Candid>(v__, TranscriptionWord.toCandidValue))));
+                case null ();
+            };
+            switch (value.segments) {
+                case (?v__) List.add(buf, ("segments", #Array(Array.map<TranscriptionSegment, Candid.Candid>(v__, TranscriptionSegment.toCandidValue))));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranscriptionResponseVerboseJson) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranscriptionResponseVerboseJson = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateTranscriptionResponseVerboseJson) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionResponseVerboseJson =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?language_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "language") else return null;
+                    let ?language = ((switch (language_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?duration_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "duration") else return null;
+                    let ?duration = ((switch (duration_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                    let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let words : ?[TranscriptionWord] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "words")) {
+                        case (?words_field) ((switch (words_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<TranscriptionWord>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = TranscriptionWord.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    let segments : ?[TranscriptionSegment] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "segments")) {
+                        case (?segments_field) ((switch (segments_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<TranscriptionSegment>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = TranscriptionSegment.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    ?{
+                        language;
+                        duration;
+                        text_;
+                        words;
+                        segments;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

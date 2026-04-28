@@ -1,40 +1,39 @@
 /// High level guidance for the amount of context window space to use for the  search. One of `low`, `medium`, or `high`. `medium` is the default. 
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // WebSearchContextSize.mo
 /// Enum values: #low, #medium, #high
 
 module {
-    // User-facing type: type-safe variants for application code
     public type WebSearchContextSize = {
         #low;
         #medium;
         #high;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer WebSearchContextSize type
-        public type JSON = Text;
+        public func toCandidValue(value : WebSearchContextSize) : Candid.Candid =
+            switch (value) {
+                case (#low) #Text("low");
+                case (#medium) #Text("medium");
+                case (#high) #Text("high");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : WebSearchContextSize) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?WebSearchContextSize =
+            switch (candid) {
+                case (#Text("low")) ?#low;
+                case (#Text("medium")) ?#medium;
+                case (#Text("high")) ?#high;
+                case _ null;
+            };
+
+        public func toText(value : WebSearchContextSize) : Text =
             switch (value) {
                 case (#low) "low";
                 case (#medium) "medium";
                 case (#high) "high";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?WebSearchContextSize =
-            switch (json) {
-                case "low" ?#low;
-                case "medium" ?#medium;
-                case "high" ?#high;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : WebSearchContextSize) : ?Text = null;
-    }
-}
+    };
+};

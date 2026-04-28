@@ -3,11 +3,13 @@
 import { type CompletionUsageCompletionTokensDetails; JSON = CompletionUsageCompletionTokensDetails } "./CompletionUsageCompletionTokensDetails";
 
 import { type CompletionUsagePromptTokensDetails; JSON = CompletionUsagePromptTokensDetails } "./CompletionUsagePromptTokensDetails";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CompletionUsage.mo
 
 module {
-    // User-facing type: what application code uses
     public type CompletionUsage = {
         /// Number of tokens in the generated completion.
         completion_tokens : Int;
@@ -19,27 +21,49 @@ module {
         prompt_tokens_details : ?CompletionUsagePromptTokensDetails;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CompletionUsage type
-        public type JSON = {
-            completion_tokens : Int;
-            prompt_tokens : Int;
-            total_tokens : Int;
-            completion_tokens_details : ?CompletionUsageCompletionTokensDetails;
-            prompt_tokens_details : ?CompletionUsagePromptTokensDetails;
+        public func toCandidValue(value : CompletionUsage) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("completion_tokens", #Int(value.completion_tokens)));
+            List.add(buf, ("prompt_tokens", #Int(value.prompt_tokens)));
+            List.add(buf, ("total_tokens", #Int(value.total_tokens)));
+            switch (value.completion_tokens_details) {
+                case (?v__) List.add(buf, ("completion_tokens_details", CompletionUsageCompletionTokensDetails.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.prompt_tokens_details) {
+                case (?v__) List.add(buf, ("prompt_tokens_details", CompletionUsagePromptTokensDetails.toCandidValue(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CompletionUsage) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CompletionUsage = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CompletionUsage) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CompletionUsage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?completion_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens") else return null;
+                    let ?completion_tokens = ((switch (completion_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?prompt_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens") else return null;
+                    let ?prompt_tokens = ((switch (prompt_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
+                    let ?total_tokens = ((switch (total_tokens_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let completion_tokens_details : ?CompletionUsageCompletionTokensDetails = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens_details")) {
+                        case (?completion_tokens_details_field) (CompletionUsageCompletionTokensDetails.fromCandidValue(completion_tokens_details_field.1));
+                        case null null;
+                    };
+                    let prompt_tokens_details : ?CompletionUsagePromptTokensDetails = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens_details")) {
+                        case (?prompt_tokens_details_field) (CompletionUsagePromptTokensDetails.fromCandidValue(prompt_tokens_details_field.1));
+                        case null null;
+                    };
+                    ?{
+                        completion_tokens;
+                        prompt_tokens;
+                        total_tokens;
+                        completion_tokens_details;
+                        prompt_tokens_details;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

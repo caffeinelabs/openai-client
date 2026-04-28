@@ -6,49 +6,56 @@ import { type CreateModerationRequestInputOneOfInnerOneOf1; JSON = CreateModerat
 import { type CreateModerationRequestInputOneOfInnerOneOf1Type; JSON = CreateModerationRequestInputOneOfInnerOneOf1Type } "./CreateModerationRequestInputOneOfInnerOneOf1Type";
 
 import { type CreateModerationRequestInputOneOfInnerOneOfImageUrl; JSON = CreateModerationRequestInputOneOfInnerOneOfImageUrl } "./CreateModerationRequestInputOneOfInnerOneOfImageUrl";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationRequestInputOneOfInner.mo
-import Runtime "mo:core/Runtime";
+// Discriminator-oneOf — wire is a flat object whose `type`
+// field selects the schema. Branches' `toCandidValue` already include that field, so dispatch
+// is just a forward call (no re-wrapping).
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type CreateModerationRequestInputOneOfInner = {
-        #CreateModerationRequestInputOneOfInnerOneOf : CreateModerationRequestInputOneOfInnerOneOf;
-        #CreateModerationRequestInputOneOfInnerOneOf1 : CreateModerationRequestInputOneOfInnerOneOf1;
+        #image_url : CreateModerationRequestInputOneOfInnerOneOf;
+        #text_ : CreateModerationRequestInputOneOfInnerOneOf1;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
+        public func toCandidValue(value : CreateModerationRequestInputOneOfInner) : Candid.Candid =
+            switch (value) {
+                case (#image_url(v)) CreateModerationRequestInputOneOfInnerOneOf.toCandidValue(v);
+                case (#text_(v)) CreateModerationRequestInputOneOfInnerOneOf1.toCandidValue(v);
+            };
+
         public func toText(value : CreateModerationRequestInputOneOfInner) : Text =
             switch (value) {
-                case (#CreateModerationRequestInputOneOfInnerOneOf(v)) Runtime.unreachable();
-                case (#CreateModerationRequestInputOneOfInnerOneOf1(v)) Runtime.unreachable();
+                case (#image_url(_)) "image_url";
+                case (#text_(_)) "text";
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationRequestInputOneOfInner type
-        public type JSON = {
-            #CreateModerationRequestInputOneOfInnerOneOf : CreateModerationRequestInputOneOfInnerOneOf;
-            #CreateModerationRequestInputOneOfInnerOneOf1 : CreateModerationRequestInputOneOfInnerOneOf1;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationRequestInputOneOfInner) : JSON =
-            switch (value) {
-                case (#CreateModerationRequestInputOneOfInnerOneOf(v)) #CreateModerationRequestInputOneOfInnerOneOf(v);
-                case (#CreateModerationRequestInputOneOfInnerOneOf1(v)) #CreateModerationRequestInputOneOfInnerOneOf1(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationRequestInputOneOfInner =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?discPair = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    switch (discPair.1) {
+                        case (#Text(disc)) {
+                            switch (disc) {
+                                case ("image_url") {
+                                    let ?inner = CreateModerationRequestInputOneOfInnerOneOf.fromCandidValue(candid) else return null;
+                                    ?#image_url(inner);
+                                };
+                                case ("text") {
+                                    let ?inner = CreateModerationRequestInputOneOfInnerOneOf1.fromCandidValue(candid) else return null;
+                                    ?#text_(inner);
+                                };
+                                case _ null;
+                            };
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationRequestInputOneOfInner =
-            switch (json) {
-                case (#CreateModerationRequestInputOneOfInnerOneOf(v)) ?#CreateModerationRequestInputOneOfInnerOneOf(v);
-                case (#CreateModerationRequestInputOneOfInnerOneOf1(v)) ?#CreateModerationRequestInputOneOfInnerOneOf1(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : CreateModerationRequestInputOneOfInner) : ?Text = null;
-    }
-}
+    };
+};

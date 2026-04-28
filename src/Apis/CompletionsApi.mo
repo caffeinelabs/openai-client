@@ -4,6 +4,7 @@ import Text "mo:core/Text";
 import Int "mo:core/Int";
 import Blob "mo:core/Blob";
 import Array "mo:core/Array";
+import List "mo:core/List";
 import Error "mo:core/Error";
 import Base64 "mo:core/Base64";
 import { JSON; Candid } "mo:serde-core";
@@ -89,19 +90,9 @@ module {
             method = #post;
             headers;
             body = do ? {
-
-                // Pre-flight validation (`diagnostics=true`): if the request body's type
-                // (or any nested empty-fallback field) carries a generator diagnostic,
-                // throw it now so the consumer's `catch (e) { e.message() }` sees the
-                // explanation directly instead of a downstream HTTP 4xx.
-                switch (CreateCompletionRequest.validate(createCompletionRequest)) {
-                    case (?msg) throw Error.reject(msg);
-                    case null ();
-                };
-
-                let jsonValue = CreateCompletionRequest.toJSON(createCompletionRequest);
-                let candidBlob = to_candid(jsonValue);
-                let #ok(jsonText) = JSON.toText(candidBlob, ["model", "prompt", "best_of", "echo", "frequency_penalty", "logit_bias", "logprobs", "max_tokens", "n", "presence_penalty", "seed", "stop", "stream", "stream_options", "suffix", "temperature", "top_p", "user"], ?{ Candid.defaultOptions with skip_null_fields = true }) else throw Error.reject("Failed to serialize to JSON");
+                let candidValue : Candid.Candid = CreateCompletionRequest.toCandidValue(createCompletionRequest);
+                let #ok(jsonText) = JSON.fromCandid(candidValue)
+                    else throw Error.reject("Failed to serialize body to JSON");
                 Text.encodeUtf8(jsonText)
             };
         };
@@ -117,18 +108,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?CreateCompletionResponse.JSON |>
-            (switch (_) {
-                case (?jsonValue) {
-                    switch (CreateCompletionResponse.fromJSON(jsonValue)) {
-                        case (?value) value;
-                        case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to CreateCompletionResponse");
-                    }
-                };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
+            (switch (CreateCompletionResponse.fromCandidValue(_)) {
+                case (?value) value;
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to CreateCompletionResponse" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw

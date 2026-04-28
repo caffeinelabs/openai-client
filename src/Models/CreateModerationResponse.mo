@@ -1,11 +1,13 @@
 /// Represents if a given text input is potentially harmful.
 
 import { type CreateModerationResponseResultsInner; JSON = CreateModerationResponseResultsInner } "./CreateModerationResponseResultsInner";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationResponse.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateModerationResponse = {
         /// The unique identifier for the moderation request.
         id : Text;
@@ -15,25 +17,41 @@ module {
         results : [CreateModerationResponseResultsInner];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationResponse type
-        public type JSON = {
-            id : Text;
-            model : Text;
-            results : [CreateModerationResponseResultsInner];
+        public func toCandidValue(value : CreateModerationResponse) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("id", #Text(value.id)));
+            List.add(buf, ("model", #Text(value.model)));
+            List.add(buf, ("results", #Array(Array.map<CreateModerationResponseResultsInner, Candid.Candid>(value.results, CreateModerationResponseResultsInner.toCandidValue))));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationResponse) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationResponse = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateModerationResponse) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponse =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model = ((switch (model_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?results_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "results") else return null;
+                    let ?results = ((switch (results_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<CreateModerationResponseResultsInner>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = CreateModerationResponseResultsInner.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    })) else return null;
+                    ?{
+                        id;
+                        model;
+                        results;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

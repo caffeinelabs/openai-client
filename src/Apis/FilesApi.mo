@@ -4,6 +4,7 @@ import Text "mo:core/Text";
 import Int "mo:core/Int";
 import Blob "mo:core/Blob";
 import Array "mo:core/Array";
+import List "mo:core/List";
 import Error "mo:core/Error";
 import Base64 "mo:core/Base64";
 import { JSON; Candid } "mo:serde-core";
@@ -105,18 +106,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?OpenAIFile.JSON |>
-            (switch (_) {
-                case (?jsonValue) {
-                    switch (OpenAIFile.fromJSON(jsonValue)) {
-                        case (?value) value;
-                        case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to OpenAIFile");
-                    }
-                };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
+            (switch (OpenAIFile.fromCandidValue(_)) {
+                case (?value) value;
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to OpenAIFile" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -186,18 +185,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?DeleteFileResponse.JSON |>
-            (switch (_) {
-                case (?jsonValue) {
-                    switch (DeleteFileResponse.fromJSON(jsonValue)) {
-                        case (?value) value;
-                        case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to DeleteFileResponse");
-                    }
-                };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
+            (switch (DeleteFileResponse.fromCandidValue(_)) {
+                case (?value) value;
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to DeleteFileResponse" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -267,13 +264,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?Text |>
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
             (switch (_) {
-                case (?result) result;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+                case (#Int(i__)) i__;
+                case _ throw Error.reject("HTTP " # Int.toText(response.status) # ": Unexpected primitive shape");
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -293,7 +293,7 @@ module {
     public func listFiles(config : Config, purpose : Text, limit : Int, order : ListAssistantsOrderParameter, after : Text) : async* ListFilesResponse {
         let {baseUrl; cycles} = config;
         let baseUrl__ = baseUrl # "/files"
-            # "?" # "purpose=" # purpose # "&" # "limit=" # Int.toText(limit) # "&" # "order=" # ListAssistantsOrderParameter.toJSON(order) # "&" # "after=" # after;
+            # "?" # "purpose=" # purpose # "&" # "limit=" # Int.toText(limit) # "&" # "order=" # ListAssistantsOrderParameter.toText(order) # "&" # "after=" # after;
 
         // Add API key as query parameter if using apiKey auth
         let url = switch (config.auth) {
@@ -343,18 +343,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?ListFilesResponse.JSON |>
-            (switch (_) {
-                case (?jsonValue) {
-                    switch (ListFilesResponse.fromJSON(jsonValue)) {
-                        case (?value) value;
-                        case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to ListFilesResponse");
-                    }
-                };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
+            (switch (ListFilesResponse.fromCandidValue(_)) {
+                case (?value) value;
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to ListFilesResponse" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -424,18 +422,16 @@ module {
                 case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode response body as UTF-8" # " (" # Int.toText(response.body.size()) # " bytes of non-UTF-8 data — server may have returned binary, gzipped, or non-UTF-8-charset content)");
             }) |>
             (switch (JSON.fromText(_, null)) {
-                case (#ok(blob)) blob;
+                case (#ok(blob__)) blob__;
                 case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to parse JSON: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             }) |>
-            from_candid(_) : ?OpenAIFile.JSON |>
-            (switch (_) {
-                case (?jsonValue) {
-                    switch (OpenAIFile.fromJSON(jsonValue)) {
-                        case (?value) value;
-                        case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to OpenAIFile");
-                    }
-                };
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to deserialize response" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            (switch (Candid.decodeOne(_, [], null)) {
+                case (#ok(c__)) c__;
+                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to decode Candid: " # msg # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
+            }) |>
+            (switch (OpenAIFile.fromCandidValue(_)) {
+                case (?value) value;
+                case null throw Error.reject("HTTP " # Int.toText(response.status) # ": Failed to convert response to OpenAIFile" # " — server returned: " # (switch (Text.decodeUtf8(response.body)) { case (?t) t; case null "(undecodable bytes)" }));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw

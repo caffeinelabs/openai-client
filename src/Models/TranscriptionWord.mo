@@ -1,8 +1,10 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // TranscriptionWord.mo
 
 module {
-    // User-facing type: what application code uses
     public type TranscriptionWord = {
         /// The text content of the word.
         word : Text;
@@ -12,25 +14,31 @@ module {
         end : Float;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer TranscriptionWord type
-        public type JSON = {
-            word : Text;
-            start : Float;
-            end : Float;
+        public func toCandidValue(value : TranscriptionWord) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("word", #Text(value.word)));
+            List.add(buf, ("start", #Float(value.start)));
+            List.add(buf, ("end", #Float(value.end)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : TranscriptionWord) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?TranscriptionWord = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : TranscriptionWord) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?TranscriptionWord =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?word_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "word") else return null;
+                    let ?word = ((switch (word_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?start_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start") else return null;
+                    let ?start = ((switch (start_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?end_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end") else return null;
+                    let ?end = ((switch (end_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    ?{
+                        word;
+                        start;
+                        end;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

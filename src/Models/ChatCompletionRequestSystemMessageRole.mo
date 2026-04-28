@@ -1,34 +1,31 @@
 /// The role of the messages author, in this case `system`.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestSystemMessageRole.mo
 /// Enum values: #system_
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ChatCompletionRequestSystemMessageRole = {
         #system_;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestSystemMessageRole type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestSystemMessageRole) : JSON =
+        public func toCandidValue(value : ChatCompletionRequestSystemMessageRole) : Candid.Candid =
             switch (value) {
-                case (#system_) "system";
+                case (#system_) #Text("system");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestSystemMessageRole =
-            switch (json) {
-                case "system" ?#system_;
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestSystemMessageRole =
+            switch (candid) {
+                case (#Text("system")) ?#system_;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ChatCompletionRequestSystemMessageRole) : ?Text = null;
-    }
-}
+        public func toText(value : ChatCompletionRequestSystemMessageRole) : Text =
+            switch (value) {
+                case (#system_) "system";
+            };
+    };
+};

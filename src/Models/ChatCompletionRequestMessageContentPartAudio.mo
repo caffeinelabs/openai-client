@@ -3,44 +3,39 @@
 import { type ChatCompletionRequestMessageContentPartAudioInputAudio; JSON = ChatCompletionRequestMessageContentPartAudioInputAudio } "./ChatCompletionRequestMessageContentPartAudioInputAudio";
 
 import { type ChatCompletionRequestMessageContentPartAudioType; JSON = ChatCompletionRequestMessageContentPartAudioType } "./ChatCompletionRequestMessageContentPartAudioType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestMessageContentPartAudio.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionRequestMessageContentPartAudio = {
         type_ : ChatCompletionRequestMessageContentPartAudioType;
         input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestMessageContentPartAudio type
-        public type JSON = {
-            type_ : ChatCompletionRequestMessageContentPartAudioType.JSON;
-            input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio.JSON;
+        public func toCandidValue(value : ChatCompletionRequestMessageContentPartAudio) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", ChatCompletionRequestMessageContentPartAudioType.toCandidValue(value.type_)));
+            List.add(buf, ("input_audio", ChatCompletionRequestMessageContentPartAudioInputAudio.toCandidValue(value.input_audio)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestMessageContentPartAudio) : JSON = {
-            type_ = ChatCompletionRequestMessageContentPartAudioType.toJSON(value.type_);
-            input_audio = ChatCompletionRequestMessageContentPartAudioInputAudio.toJSON(value.input_audio);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestMessageContentPartAudio {
-            let ?type_ = ChatCompletionRequestMessageContentPartAudioType.fromJSON(json.type_) else return null;
-            let ?input_audio = ChatCompletionRequestMessageContentPartAudioInputAudio.fromJSON(json.input_audio) else return null;
-            ?{
-                type_;
-                input_audio;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionRequestMessageContentPartAudio) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessageContentPartAudio =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (ChatCompletionRequestMessageContentPartAudioType.fromCandidValue(type__field.1)) else return null;
+                    let ?input_audio_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_audio") else return null;
+                    let ?input_audio = (ChatCompletionRequestMessageContentPartAudioInputAudio.fromCandidValue(input_audio_field.1)) else return null;
+                    ?{
+                        type_;
+                        input_audio;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

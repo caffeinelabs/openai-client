@@ -1,10 +1,12 @@
 /// The quality of the image that will be generated.   - `auto` (default value) will automatically select the best quality for the given model. - `high`, `medium` and `low` are supported for `gpt-image-1`. - `hd` and `standard` are supported for `dall-e-3`. - `standard` is the only option for `dall-e-2`. 
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateImageRequestQuality.mo
 /// Enum values: #standard, #hd, #low, #medium, #high, #auto
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateImageRequestQuality = {
         #standard;
         #hd;
@@ -14,14 +16,29 @@ module {
         #auto;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateImageRequestQuality type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateImageRequestQuality) : Candid.Candid =
+            switch (value) {
+                case (#standard) #Text("standard");
+                case (#hd) #Text("hd");
+                case (#low) #Text("low");
+                case (#medium) #Text("medium");
+                case (#high) #Text("high");
+                case (#auto) #Text("auto");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateImageRequestQuality) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateImageRequestQuality =
+            switch (candid) {
+                case (#Text("standard")) ?#standard;
+                case (#Text("hd")) ?#hd;
+                case (#Text("low")) ?#low;
+                case (#Text("medium")) ?#medium;
+                case (#Text("high")) ?#high;
+                case (#Text("auto")) ?#auto;
+                case _ null;
+            };
+
+        public func toText(value : CreateImageRequestQuality) : Text =
             switch (value) {
                 case (#standard) "standard";
                 case (#hd) "hd";
@@ -30,20 +47,5 @@ module {
                 case (#high) "high";
                 case (#auto) "auto";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateImageRequestQuality =
-            switch (json) {
-                case "standard" ?#standard;
-                case "hd" ?#hd;
-                case "low" ?#low;
-                case "medium" ?#medium;
-                case "high" ?#high;
-                case "auto" ?#auto;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateImageRequestQuality) : ?Text = null;
-    }
-}
+    };
+};

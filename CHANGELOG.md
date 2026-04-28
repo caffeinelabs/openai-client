@@ -4,6 +4,82 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.0) — 2026-04-28
+
+### Changed (BREAKING)
+
+- The Motoko codegen now controls JSON wire shape end-to-end, replacing the
+  prior `to_candid(jsonValue) → JSON.toText(blob, …)` pipeline (which made
+  Motoko's built-in `to_candid` decide wire shape — wrong for any construct
+  OpenAPI doesn't map onto Candid 1:1). Each model now emits
+  `toCandidValue : T → Candid.Candid` and `fromCandidValue : Candid.Candid → ?T`
+  in its `JSON` sub-module; `api.mustache` pipes the body through
+  `JSON.fromCandid(candidValue)` directly (no Candid blob roundtrip).
+
+- **Discriminator-oneOf flattening**: `ChatCompletionRequestMessage` (and any
+  other oneOf whose branches share a single-valued enum discriminator like
+  `role`) now serialise as a flat object with the discriminator inlined —
+  e.g. `{"role": "user", "content": "…"}` instead of the previous
+  `{"#ChatCompletionRequestUserMessage": {"role": "user", "content": "…"}}`
+  that OpenAI rejected as "Missing required parameter: 'messages[0].role'".
+
+- **User-facing variant tags renamed** to the OpenAPI `discriminator.mapping`
+  key (or, when no explicit discriminator, the inferred single-valued enum
+  literal). This is a breaking change for callers:
+    - `#ChatCompletionRequestSystemMessage(...)` → `#system_(...)` (trailing
+      `_` for Motoko keyword collision).
+    - `#ChatCompletionRequestUserMessage(...)` → `#user(...)`.
+    - `#ChatCompletionRequestAssistantMessage(...)` → `#assistant(...)`.
+    - `#ChatCompletionRequestToolMessage(...)` → `#tool(...)`.
+    - `#ChatCompletionRequestFunctionMessage(...)` → `#function(...)`.
+    - `#ChatCompletionRequestDeveloperMessage(...)` → `#developer(...)`.
+
+- **String-or-array oneOf flattening**: `ChatCompletionRequestUserMessageContent`
+  and friends now wire as either a JSON string or a JSON array directly,
+  with user-facing tags `#string : Text` and `#array : [...]` (replacing the
+  previous `#one_of_0` / type-named tags that wrapped under `#tag` on the wire).
+
+- **Null-elision** is now a structural property of the codegen — optional
+  fields with value `null` are simply not constructed, so the wire object
+  never carries `"x": null`. `skip_null_fields = true` is no longer required
+  at the JSON-encoder boundary.
+
+### Added
+
+- `T.JSON.toText(value : T) : Text` for enums, string-flatten oneOfs, and
+  discriminator-oneOfs — used by `api.mustache` for path / query / header
+  param interpolation (replacing the old `T.JSON.toJSON(...)` API).
+
+### Removed
+
+- Pre-flight `validate(value : T) : ?Text` hooks per model and the
+  corresponding `validate(body)` call in `api.mustache`. Direct shape
+  control replaces preflight diagnostics for the request side; the
+  `--additional-properties=diagnostics=true` flag is still honoured for
+  reply-side `— server returned: <body>` suffixing on error throws.
+
+### Migration
+
+```motoko
+// before (0.1.3)
+let request : CreateChatCompletionRequest = {
+  …
+  messages = [
+    #ChatCompletionRequestSystemMessage({ content = #one_of_0(sys); role = #system_; name = null }),
+    #ChatCompletionRequestUserMessage(  { content = #one_of_0(usr); role = #user;    name = null }),
+  ];
+};
+
+// after (0.2.0)
+let request : CreateChatCompletionRequest = {
+  …
+  messages = [
+    #system_({ content = #string(sys); role = #system_; name = null }),
+    #user(   { content = #string(usr); role = #user;    name = null }),
+  ];
+};
+```
+
 ## [0.1.3](https://github.com/caffeinelabs/openai-client/releases/tag/v0.1.3) — 2026-04-27
 
 ### Fixed

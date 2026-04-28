@@ -1,11 +1,13 @@
 /// Represents an embedding vector returned by embedding endpoint. 
 
 import { type EmbeddingObject; JSON = EmbeddingObject } "./EmbeddingObject";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // Embedding.mo
 
 module {
-    // User-facing type: what application code uses
     public type Embedding = {
         /// The index of the embedding in the list of embeddings.
         index : Int;
@@ -14,32 +16,41 @@ module {
         object_ : EmbeddingObject;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer Embedding type
-        public type JSON = {
-            index : Int;
-            embedding : [Float];
-            object_ : EmbeddingObject.JSON;
+        public func toCandidValue(value : Embedding) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("index", #Int(value.index)));
+            List.add(buf, ("embedding", #Array(Array.map<Float, Candid.Candid>(value.embedding, func(f : Float) : Candid.Candid = #Float(f)))));
+            List.add(buf, ("object", EmbeddingObject.toCandidValue(value.object_)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : Embedding) : JSON = { value with
-            object_ = EmbeddingObject.toJSON(value.object_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?Embedding {
-            let ?object_ = EmbeddingObject.fromJSON(json.object_) else return null;
-            ?{ json with
-                object_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : Embedding) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?Embedding =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                    let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?embedding_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "embedding") else return null;
+                    let ?embedding = ((switch (embedding_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<Float>();
+                            for (c__ in xs__.values()) {
+                                let #Float(f__) = c__ else return null;
+                                List.add(buf__, f__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    })) else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object_ = (EmbeddingObject.fromCandidValue(object__field.1)) else return null;
+                    ?{
+                        index;
+                        embedding;
+                        object_;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

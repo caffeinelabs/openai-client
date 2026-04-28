@@ -1,10 +1,12 @@
 /// The format of the output, in one of these options: `json`, `text`, `srt`, `verbose_json`, or `vtt`. 
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateTranslationRequestResponseFormat.mo
 /// Enum values: #json, #text_, #srt, #verbose_json, #vtt
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateTranslationRequestResponseFormat = {
         #json;
         #text_;
@@ -13,14 +15,27 @@ module {
         #vtt;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateTranslationRequestResponseFormat type
-        public type JSON = Text;
+        public func toCandidValue(value : CreateTranslationRequestResponseFormat) : Candid.Candid =
+            switch (value) {
+                case (#json) #Text("json");
+                case (#text_) #Text("text");
+                case (#srt) #Text("srt");
+                case (#verbose_json) #Text("verbose_json");
+                case (#vtt) #Text("vtt");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateTranslationRequestResponseFormat) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranslationRequestResponseFormat =
+            switch (candid) {
+                case (#Text("json")) ?#json;
+                case (#Text("text")) ?#text_;
+                case (#Text("srt")) ?#srt;
+                case (#Text("verbose_json")) ?#verbose_json;
+                case (#Text("vtt")) ?#vtt;
+                case _ null;
+            };
+
+        public func toText(value : CreateTranslationRequestResponseFormat) : Text =
             switch (value) {
                 case (#json) "json";
                 case (#text_) "text";
@@ -28,19 +43,5 @@ module {
                 case (#verbose_json) "verbose_json";
                 case (#vtt) "vtt";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateTranslationRequestResponseFormat =
-            switch (json) {
-                case "json" ?#json;
-                case "text" ?#text_;
-                case "srt" ?#srt;
-                case "verbose_json" ?#verbose_json;
-                case "vtt" ?#vtt;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateTranslationRequestResponseFormat) : ?Text = null;
-    }
-}
+    };
+};

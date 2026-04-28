@@ -1,39 +1,34 @@
 /// Default response format. Used to generate text responses. 
 
 import { type ResponseFormatTextType; JSON = ResponseFormatTextType } "./ResponseFormatTextType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ResponseFormatText.mo
 
 module {
-    // User-facing type: what application code uses
     public type ResponseFormatText = {
         type_ : ResponseFormatTextType;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ResponseFormatText type
-        public type JSON = {
-            type_ : ResponseFormatTextType.JSON;
+        public func toCandidValue(value : ResponseFormatText) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", ResponseFormatTextType.toCandidValue(value.type_)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ResponseFormatText) : JSON = {
-            type_ = ResponseFormatTextType.toJSON(value.type_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ResponseFormatText {
-            let ?type_ = ResponseFormatTextType.fromJSON(json.type_) else return null;
-            ?{
-                type_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ResponseFormatText) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ResponseFormatText =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (ResponseFormatTextType.fromCandidValue(type__field.1)) else return null;
+                    ?{
+                        type_;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

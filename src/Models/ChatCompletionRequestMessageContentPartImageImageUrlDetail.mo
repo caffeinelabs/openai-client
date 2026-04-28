@@ -1,40 +1,39 @@
 /// Specifies the detail level of the image. Learn more in the [Vision guide](/docs/guides/vision#low-or-high-fidelity-image-understanding).
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestMessageContentPartImageImageUrlDetail.mo
 /// Enum values: #auto, #low, #high
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ChatCompletionRequestMessageContentPartImageImageUrlDetail = {
         #auto;
         #low;
         #high;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestMessageContentPartImageImageUrlDetail type
-        public type JSON = Text;
+        public func toCandidValue(value : ChatCompletionRequestMessageContentPartImageImageUrlDetail) : Candid.Candid =
+            switch (value) {
+                case (#auto) #Text("auto");
+                case (#low) #Text("low");
+                case (#high) #Text("high");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestMessageContentPartImageImageUrlDetail) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessageContentPartImageImageUrlDetail =
+            switch (candid) {
+                case (#Text("auto")) ?#auto;
+                case (#Text("low")) ?#low;
+                case (#Text("high")) ?#high;
+                case _ null;
+            };
+
+        public func toText(value : ChatCompletionRequestMessageContentPartImageImageUrlDetail) : Text =
             switch (value) {
                 case (#auto) "auto";
                 case (#low) "low";
                 case (#high) "high";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestMessageContentPartImageImageUrlDetail =
-            switch (json) {
-                case "auto" ?#auto;
-                case "low" ?#low;
-                case "high" ?#high;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ChatCompletionRequestMessageContentPartImageImageUrlDetail) : ?Text = null;
-    }
-}
+    };
+};

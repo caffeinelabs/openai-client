@@ -1,33 +1,30 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner.mo
 /// Enum values: #text_
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner = {
         #text_;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner) : JSON =
+        public func toCandidValue(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner) : Candid.Candid =
             switch (value) {
-                case (#text_) "text";
+                case (#text_) #Text("text");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner =
-            switch (json) {
-                case "text" ?#text_;
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner =
+            switch (candid) {
+                case (#Text("text")) ?#text_;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner) : ?Text = null;
-    }
-}
+        public func toText(value : CreateModerationResponseResultsInnerCategoryAppliedInputTypesHateInner) : Text =
+            switch (value) {
+                case (#text_) "text";
+            };
+    };
+};

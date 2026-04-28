@@ -3,41 +3,39 @@
 import { type PredictionContentContent; JSON = PredictionContentContent } "./PredictionContentContent";
 
 import { type PredictionContentType; JSON = PredictionContentType } "./PredictionContentType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // PredictionContent.mo
 
 module {
-    // User-facing type: what application code uses
     public type PredictionContent = {
         type_ : PredictionContentType;
         content : PredictionContentContent;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer PredictionContent type
-        public type JSON = {
-            type_ : PredictionContentType.JSON;
-            content : PredictionContentContent;
+        public func toCandidValue(value : PredictionContent) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", PredictionContentType.toCandidValue(value.type_)));
+            List.add(buf, ("content", PredictionContentContent.toCandidValue(value.content)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : PredictionContent) : JSON = { value with
-            type_ = PredictionContentType.toJSON(value.type_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?PredictionContent {
-            let ?type_ = PredictionContentType.fromJSON(json.type_) else return null;
-            ?{ json with
-                type_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : PredictionContent) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?PredictionContent =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (PredictionContentType.fromCandidValue(type__field.1)) else return null;
+                    let ?content_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content") else return null;
+                    let ?content = (PredictionContentContent.fromCandidValue(content_field.1)) else return null;
+                    ?{
+                        type_;
+                        content;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

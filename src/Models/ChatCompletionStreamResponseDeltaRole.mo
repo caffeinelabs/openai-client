@@ -1,10 +1,12 @@
 /// The role of the author of this message.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionStreamResponseDeltaRole.mo
 /// Enum values: #developer, #system_, #user, #assistant, #tool
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ChatCompletionStreamResponseDeltaRole = {
         #developer;
         #system_;
@@ -13,14 +15,27 @@ module {
         #tool;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionStreamResponseDeltaRole type
-        public type JSON = Text;
+        public func toCandidValue(value : ChatCompletionStreamResponseDeltaRole) : Candid.Candid =
+            switch (value) {
+                case (#developer) #Text("developer");
+                case (#system_) #Text("system");
+                case (#user) #Text("user");
+                case (#assistant) #Text("assistant");
+                case (#tool) #Text("tool");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionStreamResponseDeltaRole) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionStreamResponseDeltaRole =
+            switch (candid) {
+                case (#Text("developer")) ?#developer;
+                case (#Text("system")) ?#system_;
+                case (#Text("user")) ?#user;
+                case (#Text("assistant")) ?#assistant;
+                case (#Text("tool")) ?#tool;
+                case _ null;
+            };
+
+        public func toText(value : ChatCompletionStreamResponseDeltaRole) : Text =
             switch (value) {
                 case (#developer) "developer";
                 case (#system_) "system";
@@ -28,19 +43,5 @@ module {
                 case (#assistant) "assistant";
                 case (#tool) "tool";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionStreamResponseDeltaRole =
-            switch (json) {
-                case "developer" ?#developer;
-                case "system" ?#system_;
-                case "user" ?#user;
-                case "assistant" ?#assistant;
-                case "tool" ?#tool;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ChatCompletionStreamResponseDeltaRole) : ?Text = null;
-    }
-}
+    };
+};

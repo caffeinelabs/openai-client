@@ -1,47 +1,40 @@
 /// Not supported with latest reasoning models `o3` and `o4-mini`.  Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence. 
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // StopConfiguration.mo
-import Runtime "mo:core/Runtime";
+// oneOf<Text, [Text]> on the wire — emit as
+// `#string : Text` or `#array : [...]` user-side, projected to JSON string-or-array directly.
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type StopConfiguration = {
-        #one_of_0 : Text;
-        #one_of_1 : [Text];
+        #string : Text;
+        #array : [Text];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : StopConfiguration) : Text =
+        public func toCandidValue(value : StopConfiguration) : Candid.Candid =
             switch (value) {
-                case (#one_of_0(v)) Runtime.unreachable();
-                case (#one_of_1(v)) Runtime.unreachable();
+                case (#string(s)) #Text(s);
+                case (#array(xs)) #Array(Array.map<Text, Candid.Candid>(
+                    xs,
+                    func(s : Text) : Candid.Candid = #Text(s)
+                ));
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer StopConfiguration type
-        public type JSON = {
-            #one_of_0 : Text;
-            #one_of_1 : [Text];
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : StopConfiguration) : JSON =
-            switch (value) {
-                case (#one_of_0(v)) #one_of_0(v);
-                case (#one_of_1(v)) #one_of_1(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?StopConfiguration =
+            switch (candid) {
+                case (#Text(s)) ?#string(s);
+                case (#Array(xs)) {
+                    let buf = List.empty<Text>();
+                    for (c in xs.values()) {
+                        let ?p = (switch c { case (#Text(s)) ?s; case _ null }) else return null;
+                        List.add(buf, p);
+                    };
+                    ?#array(List.toArray(buf));
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?StopConfiguration =
-            switch (json) {
-                case (#one_of_0(v)) ?#one_of_0(v);
-                case (#one_of_1(v)) ?#one_of_1(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : StopConfiguration) : ?Text = null;
-    }
-}
+    };
+};

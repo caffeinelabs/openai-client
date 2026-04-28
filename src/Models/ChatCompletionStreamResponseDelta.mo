@@ -5,11 +5,13 @@ import { type ChatCompletionMessageToolCallChunk; JSON = ChatCompletionMessageTo
 import { type ChatCompletionStreamResponseDeltaFunctionCall; JSON = ChatCompletionStreamResponseDeltaFunctionCall } "./ChatCompletionStreamResponseDeltaFunctionCall";
 
 import { type ChatCompletionStreamResponseDeltaRole; JSON = ChatCompletionStreamResponseDeltaRole } "./ChatCompletionStreamResponseDeltaRole";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionStreamResponseDelta.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionStreamResponseDelta = {
         /// The contents of the chunk message.
         content : ?Text;
@@ -20,33 +22,74 @@ module {
         refusal : ?Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionStreamResponseDelta type
-        public type JSON = {
-            content : ?Text;
-            function_call : ?ChatCompletionStreamResponseDeltaFunctionCall;
-            tool_calls : ?[ChatCompletionMessageToolCallChunk];
-            role : ?ChatCompletionStreamResponseDeltaRole.JSON;
-            refusal : ?Text;
+        public func toCandidValue(value : ChatCompletionStreamResponseDelta) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.content) {
+                case (?v__) List.add(buf, ("content", #Text(v__)));
+                case null ();
+            };
+            switch (value.function_call) {
+                case (?v__) List.add(buf, ("function_call", ChatCompletionStreamResponseDeltaFunctionCall.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.tool_calls) {
+                case (?v__) List.add(buf, ("tool_calls", #Array(Array.map<ChatCompletionMessageToolCallChunk, Candid.Candid>(v__, ChatCompletionMessageToolCallChunk.toCandidValue))));
+                case null ();
+            };
+            switch (value.role) {
+                case (?v__) List.add(buf, ("role", ChatCompletionStreamResponseDeltaRole.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.refusal) {
+                case (?v__) List.add(buf, ("refusal", #Text(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionStreamResponseDelta) : JSON = { value with
-            role = do ? { ChatCompletionStreamResponseDeltaRole.toJSON(value.role!) };
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionStreamResponseDelta {
-            ?{ json with
-                role = do ? { ChatCompletionStreamResponseDeltaRole.fromJSON(json.role!)! };
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionStreamResponseDelta) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionStreamResponseDelta =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                        case (?content_field) ((switch (content_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let function_call : ?ChatCompletionStreamResponseDeltaFunctionCall = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
+                        case (?function_call_field) (ChatCompletionStreamResponseDeltaFunctionCall.fromCandidValue(function_call_field.1));
+                        case null null;
+                    };
+                    let tool_calls : ?[ChatCompletionMessageToolCallChunk] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
+                        case (?tool_calls_field) ((switch (tool_calls_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<ChatCompletionMessageToolCallChunk>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = ChatCompletionMessageToolCallChunk.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    }));
+                        case null null;
+                    };
+                    let role : ?ChatCompletionStreamResponseDeltaRole = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role")) {
+                        case (?role_field) (ChatCompletionStreamResponseDeltaRole.fromCandidValue(role_field.1));
+                        case null null;
+                    };
+                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
+                        case (?refusal_field) ((switch (refusal_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        content;
+                        function_call;
+                        tool_calls;
+                        role;
+                        refusal;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

@@ -1,9 +1,11 @@
 /// Approximate location parameters for the search.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // WebSearchLocation.mo
 
 module {
-    // User-facing type: what application code uses
     public type WebSearchLocation = {
         /// The two-letter  [ISO country code](https://en.wikipedia.org/wiki/ISO_3166-1) of the user, e.g. `US`. 
         country : ?Text;
@@ -15,26 +17,55 @@ module {
         timezone : ?Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer WebSearchLocation type
-        public type JSON = {
-            country : ?Text;
-            region_ : ?Text;
-            city : ?Text;
-            timezone : ?Text;
+        public func toCandidValue(value : WebSearchLocation) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.country) {
+                case (?v__) List.add(buf, ("country", #Text(v__)));
+                case null ();
+            };
+            switch (value.region_) {
+                case (?v__) List.add(buf, ("region", #Text(v__)));
+                case null ();
+            };
+            switch (value.city) {
+                case (?v__) List.add(buf, ("city", #Text(v__)));
+                case null ();
+            };
+            switch (value.timezone) {
+                case (?v__) List.add(buf, ("timezone", #Text(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : WebSearchLocation) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?WebSearchLocation = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : WebSearchLocation) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?WebSearchLocation =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let country : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "country")) {
+                        case (?country_field) ((switch (country_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let region_ : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "region")) {
+                        case (?region__field) ((switch (region__field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let city : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "city")) {
+                        case (?city_field) ((switch (city_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let timezone : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "timezone")) {
+                        case (?timezone_field) ((switch (timezone_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        country;
+                        region_;
+                        city;
+                        timezone;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

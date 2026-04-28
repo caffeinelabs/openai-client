@@ -18,69 +18,84 @@ import { type ChatCompletionRequestSystemMessage; JSON = ChatCompletionRequestSy
 import { type ChatCompletionRequestToolMessage; JSON = ChatCompletionRequestToolMessage } "./ChatCompletionRequestToolMessage";
 
 import { type ChatCompletionRequestUserMessage; JSON = ChatCompletionRequestUserMessage } "./ChatCompletionRequestUserMessage";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestMessage.mo
-import Runtime "mo:core/Runtime";
+// Discriminator-oneOf — wire is a flat object whose `role`
+// field selects the schema. Branches' `toCandidValue` already include that field, so dispatch
+// is just a forward call (no re-wrapping).
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type ChatCompletionRequestMessage = {
-        #ChatCompletionRequestDeveloperMessage : ChatCompletionRequestDeveloperMessage;
-        #ChatCompletionRequestSystemMessage : ChatCompletionRequestSystemMessage;
-        #ChatCompletionRequestUserMessage : ChatCompletionRequestUserMessage;
-        #ChatCompletionRequestAssistantMessage : ChatCompletionRequestAssistantMessage;
-        #ChatCompletionRequestToolMessage : ChatCompletionRequestToolMessage;
-        #ChatCompletionRequestFunctionMessage : ChatCompletionRequestFunctionMessage;
+        #developer : ChatCompletionRequestDeveloperMessage;
+        #system_ : ChatCompletionRequestSystemMessage;
+        #user : ChatCompletionRequestUserMessage;
+        #assistant : ChatCompletionRequestAssistantMessage;
+        #tool : ChatCompletionRequestToolMessage;
+        #function : ChatCompletionRequestFunctionMessage;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
+        public func toCandidValue(value : ChatCompletionRequestMessage) : Candid.Candid =
+            switch (value) {
+                case (#developer(v)) ChatCompletionRequestDeveloperMessage.toCandidValue(v);
+                case (#system_(v)) ChatCompletionRequestSystemMessage.toCandidValue(v);
+                case (#user(v)) ChatCompletionRequestUserMessage.toCandidValue(v);
+                case (#assistant(v)) ChatCompletionRequestAssistantMessage.toCandidValue(v);
+                case (#tool(v)) ChatCompletionRequestToolMessage.toCandidValue(v);
+                case (#function(v)) ChatCompletionRequestFunctionMessage.toCandidValue(v);
+            };
+
         public func toText(value : ChatCompletionRequestMessage) : Text =
             switch (value) {
-                case (#ChatCompletionRequestDeveloperMessage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestSystemMessage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestUserMessage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestAssistantMessage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestToolMessage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestFunctionMessage(v)) Runtime.unreachable();
+                case (#developer(_)) "developer";
+                case (#system_(_)) "system";
+                case (#user(_)) "user";
+                case (#assistant(_)) "assistant";
+                case (#tool(_)) "tool";
+                case (#function(_)) "function";
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestMessage type
-        public type JSON = {
-            #ChatCompletionRequestDeveloperMessage : ChatCompletionRequestDeveloperMessage;
-            #ChatCompletionRequestSystemMessage : ChatCompletionRequestSystemMessage;
-            #ChatCompletionRequestUserMessage : ChatCompletionRequestUserMessage;
-            #ChatCompletionRequestAssistantMessage : ChatCompletionRequestAssistantMessage;
-            #ChatCompletionRequestToolMessage : ChatCompletionRequestToolMessage;
-            #ChatCompletionRequestFunctionMessage : ChatCompletionRequestFunctionMessage;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestMessage) : JSON =
-            switch (value) {
-                case (#ChatCompletionRequestDeveloperMessage(v)) #ChatCompletionRequestDeveloperMessage(v);
-                case (#ChatCompletionRequestSystemMessage(v)) #ChatCompletionRequestSystemMessage(v);
-                case (#ChatCompletionRequestUserMessage(v)) #ChatCompletionRequestUserMessage(v);
-                case (#ChatCompletionRequestAssistantMessage(v)) #ChatCompletionRequestAssistantMessage(v);
-                case (#ChatCompletionRequestToolMessage(v)) #ChatCompletionRequestToolMessage(v);
-                case (#ChatCompletionRequestFunctionMessage(v)) #ChatCompletionRequestFunctionMessage(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessage =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?discPair = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                    switch (discPair.1) {
+                        case (#Text(disc)) {
+                            switch (disc) {
+                                case ("developer") {
+                                    let ?inner = ChatCompletionRequestDeveloperMessage.fromCandidValue(candid) else return null;
+                                    ?#developer(inner);
+                                };
+                                case ("system") {
+                                    let ?inner = ChatCompletionRequestSystemMessage.fromCandidValue(candid) else return null;
+                                    ?#system_(inner);
+                                };
+                                case ("user") {
+                                    let ?inner = ChatCompletionRequestUserMessage.fromCandidValue(candid) else return null;
+                                    ?#user(inner);
+                                };
+                                case ("assistant") {
+                                    let ?inner = ChatCompletionRequestAssistantMessage.fromCandidValue(candid) else return null;
+                                    ?#assistant(inner);
+                                };
+                                case ("tool") {
+                                    let ?inner = ChatCompletionRequestToolMessage.fromCandidValue(candid) else return null;
+                                    ?#tool(inner);
+                                };
+                                case ("function") {
+                                    let ?inner = ChatCompletionRequestFunctionMessage.fromCandidValue(candid) else return null;
+                                    ?#function(inner);
+                                };
+                                case _ null;
+                            };
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestMessage =
-            switch (json) {
-                case (#ChatCompletionRequestDeveloperMessage(v)) ?#ChatCompletionRequestDeveloperMessage(v);
-                case (#ChatCompletionRequestSystemMessage(v)) ?#ChatCompletionRequestSystemMessage(v);
-                case (#ChatCompletionRequestUserMessage(v)) ?#ChatCompletionRequestUserMessage(v);
-                case (#ChatCompletionRequestAssistantMessage(v)) ?#ChatCompletionRequestAssistantMessage(v);
-                case (#ChatCompletionRequestToolMessage(v)) ?#ChatCompletionRequestToolMessage(v);
-                case (#ChatCompletionRequestFunctionMessage(v)) ?#ChatCompletionRequestFunctionMessage(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : ChatCompletionRequestMessage) : ?Text = null;
-    }
-}
+    };
+};

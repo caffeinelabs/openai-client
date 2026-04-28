@@ -1,35 +1,40 @@
 /// Approximate location parameters for the search. 
 
 import { type WebSearchLocation; JSON = WebSearchLocation } "./WebSearchLocation";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // WebSearchUserLocation.mo
 
 module {
-    // User-facing type: what application code uses
     public type WebSearchUserLocation = {
         /// The type of location approximation. Always `approximate`. 
         type_ : Text;
         approximate : WebSearchLocation;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer WebSearchUserLocation type
-        public type JSON = {
-            type_ : Text;
-            approximate : WebSearchLocation;
+        public func toCandidValue(value : WebSearchUserLocation) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", #Text(value.type_)));
+            List.add(buf, ("approximate", WebSearchLocation.toCandidValue(value.approximate)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : WebSearchUserLocation) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?WebSearchUserLocation = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : WebSearchUserLocation) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?WebSearchUserLocation =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = ((switch (type__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?approximate_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "approximate") else return null;
+                    let ?approximate = (WebSearchLocation.fromCandidValue(approximate_field.1)) else return null;
+                    ?{
+                        type_;
+                        approximate;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

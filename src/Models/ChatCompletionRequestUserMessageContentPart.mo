@@ -14,59 +14,70 @@ import { type ChatCompletionRequestMessageContentPartImage; JSON = ChatCompletio
 import { type ChatCompletionRequestMessageContentPartImageImageUrl; JSON = ChatCompletionRequestMessageContentPartImageImageUrl } "./ChatCompletionRequestMessageContentPartImageImageUrl";
 
 import { type ChatCompletionRequestMessageContentPartText; JSON = ChatCompletionRequestMessageContentPartText } "./ChatCompletionRequestMessageContentPartText";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestUserMessageContentPart.mo
-import Runtime "mo:core/Runtime";
+// Discriminator-oneOf — wire is a flat object whose `type`
+// field selects the schema. Branches' `toCandidValue` already include that field, so dispatch
+// is just a forward call (no re-wrapping).
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type ChatCompletionRequestUserMessageContentPart = {
-        #ChatCompletionRequestMessageContentPartText : ChatCompletionRequestMessageContentPartText;
-        #ChatCompletionRequestMessageContentPartImage : ChatCompletionRequestMessageContentPartImage;
-        #ChatCompletionRequestMessageContentPartAudio : ChatCompletionRequestMessageContentPartAudio;
-        #ChatCompletionRequestMessageContentPartFile : ChatCompletionRequestMessageContentPartFile;
+        #text_ : ChatCompletionRequestMessageContentPartText;
+        #image_url : ChatCompletionRequestMessageContentPartImage;
+        #input_audio : ChatCompletionRequestMessageContentPartAudio;
+        #file : ChatCompletionRequestMessageContentPartFile;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
+        public func toCandidValue(value : ChatCompletionRequestUserMessageContentPart) : Candid.Candid =
+            switch (value) {
+                case (#text_(v)) ChatCompletionRequestMessageContentPartText.toCandidValue(v);
+                case (#image_url(v)) ChatCompletionRequestMessageContentPartImage.toCandidValue(v);
+                case (#input_audio(v)) ChatCompletionRequestMessageContentPartAudio.toCandidValue(v);
+                case (#file(v)) ChatCompletionRequestMessageContentPartFile.toCandidValue(v);
+            };
+
         public func toText(value : ChatCompletionRequestUserMessageContentPart) : Text =
             switch (value) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestMessageContentPartImage(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestMessageContentPartAudio(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestMessageContentPartFile(v)) Runtime.unreachable();
+                case (#text_(_)) "text";
+                case (#image_url(_)) "image_url";
+                case (#input_audio(_)) "input_audio";
+                case (#file(_)) "file";
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestUserMessageContentPart type
-        public type JSON = {
-            #ChatCompletionRequestMessageContentPartText : ChatCompletionRequestMessageContentPartText;
-            #ChatCompletionRequestMessageContentPartImage : ChatCompletionRequestMessageContentPartImage;
-            #ChatCompletionRequestMessageContentPartAudio : ChatCompletionRequestMessageContentPartAudio;
-            #ChatCompletionRequestMessageContentPartFile : ChatCompletionRequestMessageContentPartFile;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestUserMessageContentPart) : JSON =
-            switch (value) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) #ChatCompletionRequestMessageContentPartText(v);
-                case (#ChatCompletionRequestMessageContentPartImage(v)) #ChatCompletionRequestMessageContentPartImage(v);
-                case (#ChatCompletionRequestMessageContentPartAudio(v)) #ChatCompletionRequestMessageContentPartAudio(v);
-                case (#ChatCompletionRequestMessageContentPartFile(v)) #ChatCompletionRequestMessageContentPartFile(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestUserMessageContentPart =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?discPair = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    switch (discPair.1) {
+                        case (#Text(disc)) {
+                            switch (disc) {
+                                case ("text") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartText.fromCandidValue(candid) else return null;
+                                    ?#text_(inner);
+                                };
+                                case ("image_url") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartImage.fromCandidValue(candid) else return null;
+                                    ?#image_url(inner);
+                                };
+                                case ("input_audio") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartAudio.fromCandidValue(candid) else return null;
+                                    ?#input_audio(inner);
+                                };
+                                case ("file") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartFile.fromCandidValue(candid) else return null;
+                                    ?#file(inner);
+                                };
+                                case _ null;
+                            };
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestUserMessageContentPart =
-            switch (json) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) ?#ChatCompletionRequestMessageContentPartText(v);
-                case (#ChatCompletionRequestMessageContentPartImage(v)) ?#ChatCompletionRequestMessageContentPartImage(v);
-                case (#ChatCompletionRequestMessageContentPartAudio(v)) ?#ChatCompletionRequestMessageContentPartAudio(v);
-                case (#ChatCompletionRequestMessageContentPartFile(v)) ?#ChatCompletionRequestMessageContentPartFile(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : ChatCompletionRequestUserMessageContentPart) : ?Text = null;
-    }
-}
+    };
+};

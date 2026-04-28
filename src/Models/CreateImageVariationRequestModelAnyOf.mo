@@ -1,33 +1,30 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateImageVariationRequestModelAnyOf.mo
 /// Enum values: #dall_e_2
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateImageVariationRequestModelAnyOf = {
         #dall_e_2;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateImageVariationRequestModelAnyOf type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateImageVariationRequestModelAnyOf) : JSON =
+        public func toCandidValue(value : CreateImageVariationRequestModelAnyOf) : Candid.Candid =
             switch (value) {
-                case (#dall_e_2) "dall-e-2";
+                case (#dall_e_2) #Text("dall-e-2");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateImageVariationRequestModelAnyOf =
-            switch (json) {
-                case "dall-e-2" ?#dall_e_2;
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateImageVariationRequestModelAnyOf =
+            switch (candid) {
+                case (#Text("dall-e-2")) ?#dall_e_2;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateImageVariationRequestModelAnyOf) : ?Text = null;
-    }
-}
+        public func toText(value : CreateImageVariationRequestModelAnyOf) : Text =
+            switch (value) {
+                case (#dall_e_2) "dall-e-2";
+            };
+    };
+};

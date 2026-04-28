@@ -3,41 +3,39 @@
 import { type CreateModerationRequestInputOneOfInnerOneOfImageUrl; JSON = CreateModerationRequestInputOneOfInnerOneOfImageUrl } "./CreateModerationRequestInputOneOfInnerOneOfImageUrl";
 
 import { type CreateModerationRequestInputOneOfInnerOneOfType; JSON = CreateModerationRequestInputOneOfInnerOneOfType } "./CreateModerationRequestInputOneOfInnerOneOfType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationRequestInputOneOfInnerOneOf.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateModerationRequestInputOneOfInnerOneOf = {
         type_ : CreateModerationRequestInputOneOfInnerOneOfType;
         image_url : CreateModerationRequestInputOneOfInnerOneOfImageUrl;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationRequestInputOneOfInnerOneOf type
-        public type JSON = {
-            type_ : CreateModerationRequestInputOneOfInnerOneOfType.JSON;
-            image_url : CreateModerationRequestInputOneOfInnerOneOfImageUrl;
+        public func toCandidValue(value : CreateModerationRequestInputOneOfInnerOneOf) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", CreateModerationRequestInputOneOfInnerOneOfType.toCandidValue(value.type_)));
+            List.add(buf, ("image_url", CreateModerationRequestInputOneOfInnerOneOfImageUrl.toCandidValue(value.image_url)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationRequestInputOneOfInnerOneOf) : JSON = { value with
-            type_ = CreateModerationRequestInputOneOfInnerOneOfType.toJSON(value.type_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationRequestInputOneOfInnerOneOf {
-            let ?type_ = CreateModerationRequestInputOneOfInnerOneOfType.fromJSON(json.type_) else return null;
-            ?{ json with
-                type_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateModerationRequestInputOneOfInnerOneOf) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationRequestInputOneOfInnerOneOf =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (CreateModerationRequestInputOneOfInnerOneOfType.fromCandidValue(type__field.1)) else return null;
+                    let ?image_url_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "image_url") else return null;
+                    let ?image_url = (CreateModerationRequestInputOneOfInnerOneOfImageUrl.fromCandidValue(image_url_field.1)) else return null;
+                    ?{
+                        type_;
+                        image_url;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

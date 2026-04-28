@@ -1,49 +1,42 @@
 /// The contents of the tool message.
 
 import { type ChatCompletionRequestMessageContentPartText; JSON = ChatCompletionRequestMessageContentPartText } "./ChatCompletionRequestMessageContentPartText";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestToolMessageContent.mo
-import Runtime "mo:core/Runtime";
+// oneOf<Text, [ChatCompletionRequestMessageContentPartText]> on the wire — emit as
+// `#string : Text` or `#array : [...]` user-side, projected to JSON string-or-array directly.
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type ChatCompletionRequestToolMessageContent = {
-        #one_of_0 : Text;
-        #ChatCompletionRequestMessageContentPartText : [ChatCompletionRequestMessageContentPartText];
+        #string : Text;
+        #array : [ChatCompletionRequestMessageContentPartText];
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : ChatCompletionRequestToolMessageContent) : Text =
+        public func toCandidValue(value : ChatCompletionRequestToolMessageContent) : Candid.Candid =
             switch (value) {
-                case (#one_of_0(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestMessageContentPartText(v)) Runtime.unreachable();
+                case (#string(s)) #Text(s);
+                case (#array(xs)) #Array(Array.map<ChatCompletionRequestMessageContentPartText, Candid.Candid>(
+                    xs,
+                    ChatCompletionRequestMessageContentPartText.toCandidValue
+                ));
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestToolMessageContent type
-        public type JSON = {
-            #one_of_0 : Text;
-            #ChatCompletionRequestMessageContentPartText : [ChatCompletionRequestMessageContentPartText];
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestToolMessageContent) : JSON =
-            switch (value) {
-                case (#one_of_0(v)) #one_of_0(v);
-                case (#ChatCompletionRequestMessageContentPartText(v)) #ChatCompletionRequestMessageContentPartText(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestToolMessageContent =
+            switch (candid) {
+                case (#Text(s)) ?#string(s);
+                case (#Array(xs)) {
+                    let buf = List.empty<ChatCompletionRequestMessageContentPartText>();
+                    for (c in xs.values()) {
+                        let ?p = ChatCompletionRequestMessageContentPartText.fromCandidValue(c) else return null;
+                        List.add(buf, p);
+                    };
+                    ?#array(List.toArray(buf));
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestToolMessageContent =
-            switch (json) {
-                case (#one_of_0(v)) ?#one_of_0(v);
-                case (#ChatCompletionRequestMessageContentPartText(v)) ?#ChatCompletionRequestMessageContentPartText(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : ChatCompletionRequestToolMessageContent) : ?Text = null;
-    }
-}
+    };
+};

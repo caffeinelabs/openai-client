@@ -3,41 +3,39 @@
 import { type JSONSchema; JSON = JSONSchema } "./JSONSchema";
 
 import { type ResponseFormatJsonSchemaType; JSON = ResponseFormatJsonSchemaType } "./ResponseFormatJsonSchemaType";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ResponseFormatJsonSchema.mo
 
 module {
-    // User-facing type: what application code uses
     public type ResponseFormatJsonSchema = {
         type_ : ResponseFormatJsonSchemaType;
         json_schema : JSONSchema;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ResponseFormatJsonSchema type
-        public type JSON = {
-            type_ : ResponseFormatJsonSchemaType.JSON;
-            json_schema : JSONSchema;
+        public func toCandidValue(value : ResponseFormatJsonSchema) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("type", ResponseFormatJsonSchemaType.toCandidValue(value.type_)));
+            List.add(buf, ("json_schema", JSONSchema.toCandidValue(value.json_schema)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ResponseFormatJsonSchema) : JSON = { value with
-            type_ = ResponseFormatJsonSchemaType.toJSON(value.type_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ResponseFormatJsonSchema {
-            let ?type_ = ResponseFormatJsonSchemaType.fromJSON(json.type_) else return null;
-            ?{ json with
-                type_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ResponseFormatJsonSchema) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ResponseFormatJsonSchema =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type_ = (ResponseFormatJsonSchemaType.fromCandidValue(type__field.1)) else return null;
+                    let ?json_schema_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "json_schema") else return null;
+                    let ?json_schema = (JSONSchema.fromCandidValue(json_schema_field.1)) else return null;
+                    ?{
+                        type_;
+                        json_schema;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

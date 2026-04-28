@@ -4,49 +4,56 @@ import { type ChatCompletionRequestMessageContentPartRefusal; JSON = ChatComplet
 import { type ChatCompletionRequestMessageContentPartRefusalType; JSON = ChatCompletionRequestMessageContentPartRefusalType } "./ChatCompletionRequestMessageContentPartRefusalType";
 
 import { type ChatCompletionRequestMessageContentPartText; JSON = ChatCompletionRequestMessageContentPartText } "./ChatCompletionRequestMessageContentPartText";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestAssistantMessageContentPart.mo
-import Runtime "mo:core/Runtime";
+// Discriminator-oneOf — wire is a flat object whose `type`
+// field selects the schema. Branches' `toCandidValue` already include that field, so dispatch
+// is just a forward call (no re-wrapping).
 
 module {
-    // User-facing type: discriminated union (oneOf)
     public type ChatCompletionRequestAssistantMessageContentPart = {
-        #ChatCompletionRequestMessageContentPartText : ChatCompletionRequestMessageContentPartText;
-        #ChatCompletionRequestMessageContentPartRefusal : ChatCompletionRequestMessageContentPartRefusal;
+        #text_ : ChatCompletionRequestMessageContentPartText;
+        #refusal : ChatCompletionRequestMessageContentPartRefusal;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
+        public func toCandidValue(value : ChatCompletionRequestAssistantMessageContentPart) : Candid.Candid =
+            switch (value) {
+                case (#text_(v)) ChatCompletionRequestMessageContentPartText.toCandidValue(v);
+                case (#refusal(v)) ChatCompletionRequestMessageContentPartRefusal.toCandidValue(v);
+            };
+
         public func toText(value : ChatCompletionRequestAssistantMessageContentPart) : Text =
             switch (value) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) Runtime.unreachable();
-                case (#ChatCompletionRequestMessageContentPartRefusal(v)) Runtime.unreachable();
+                case (#text_(_)) "text";
+                case (#refusal(_)) "refusal";
             };
 
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestAssistantMessageContentPart type
-        public type JSON = {
-            #ChatCompletionRequestMessageContentPartText : ChatCompletionRequestMessageContentPartText;
-            #ChatCompletionRequestMessageContentPartRefusal : ChatCompletionRequestMessageContentPartRefusal;
-        };
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestAssistantMessageContentPart) : JSON =
-            switch (value) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) #ChatCompletionRequestMessageContentPartText(v);
-                case (#ChatCompletionRequestMessageContentPartRefusal(v)) #ChatCompletionRequestMessageContentPartRefusal(v);
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestAssistantMessageContentPart =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?discPair = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    switch (discPair.1) {
+                        case (#Text(disc)) {
+                            switch (disc) {
+                                case ("text") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartText.fromCandidValue(candid) else return null;
+                                    ?#text_(inner);
+                                };
+                                case ("refusal") {
+                                    let ?inner = ChatCompletionRequestMessageContentPartRefusal.fromCandidValue(candid) else return null;
+                                    ?#refusal(inner);
+                                };
+                                case _ null;
+                            };
+                        };
+                        case _ null;
+                    };
+                };
+                case _ null;
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestAssistantMessageContentPart =
-            switch (json) {
-                case (#ChatCompletionRequestMessageContentPartText(v)) ?#ChatCompletionRequestMessageContentPartText(v);
-                case (#ChatCompletionRequestMessageContentPartRefusal(v)) ?#ChatCompletionRequestMessageContentPartRefusal(v);
-            };
-
-        // Pre-flight validation (`diagnostics=true`): oneOf variants currently
-        // pass through (recursive variant inspection is a v2 follow-up).
-        public func validate(_value : ChatCompletionRequestAssistantMessageContentPart) : ?Text = null;
-    }
-}
+    };
+};

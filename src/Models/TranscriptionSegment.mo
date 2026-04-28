@@ -1,8 +1,10 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // TranscriptionSegment.mo
 
 module {
-    // User-facing type: what application code uses
     public type TranscriptionSegment = {
         /// Unique identifier of the segment.
         id : Int;
@@ -26,32 +28,69 @@ module {
         no_speech_prob : Float;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer TranscriptionSegment type
-        public type JSON = {
-            id : Int;
-            seek : Int;
-            start : Float;
-            end : Float;
-            text_ : Text;
-            tokens : [Int];
-            temperature : Float;
-            avg_logprob : Float;
-            compression_ratio : Float;
-            no_speech_prob : Float;
+        public func toCandidValue(value : TranscriptionSegment) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("id", #Int(value.id)));
+            List.add(buf, ("seek", #Int(value.seek)));
+            List.add(buf, ("start", #Float(value.start)));
+            List.add(buf, ("end", #Float(value.end)));
+            List.add(buf, ("text", #Text(value.text_)));
+            List.add(buf, ("tokens", #Array(Array.map<Int, Candid.Candid>(value.tokens, func(i : Int) : Candid.Candid = #Int(i)))));
+            List.add(buf, ("temperature", #Float(value.temperature)));
+            List.add(buf, ("avg_logprob", #Float(value.avg_logprob)));
+            List.add(buf, ("compression_ratio", #Float(value.compression_ratio)));
+            List.add(buf, ("no_speech_prob", #Float(value.no_speech_prob)));
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : TranscriptionSegment) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?TranscriptionSegment = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : TranscriptionSegment) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?TranscriptionSegment =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id = ((switch (id_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?seek_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seek") else return null;
+                    let ?seek = ((switch (seek_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?start_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start") else return null;
+                    let ?start = ((switch (start_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?end_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end") else return null;
+                    let ?end = ((switch (end_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                    let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tokens") else return null;
+                    let ?tokens = ((switch (tokens_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<Int>();
+                            for (c__ in xs__.values()) {
+                                let #Int(i__) = c__ else return null;
+                                List.add(buf__, i__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    })) else return null;
+                    let ?temperature_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature") else return null;
+                    let ?temperature = ((switch (temperature_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?avg_logprob_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "avg_logprob") else return null;
+                    let ?avg_logprob = ((switch (avg_logprob_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?compression_ratio_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "compression_ratio") else return null;
+                    let ?compression_ratio = ((switch (compression_ratio_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    let ?no_speech_prob_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "no_speech_prob") else return null;
+                    let ?no_speech_prob = ((switch (no_speech_prob_field.1) { case (#Float(f)) ?f; case _ null })) else return null;
+                    ?{
+                        id;
+                        seek;
+                        start;
+                        end;
+                        text_;
+                        tokens;
+                        temperature;
+                        avg_logprob;
+                        compression_ratio;
+                        no_speech_prob;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

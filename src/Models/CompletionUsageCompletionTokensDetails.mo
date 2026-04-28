@@ -1,9 +1,11 @@
 /// Breakdown of tokens used in a completion.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CompletionUsageCompletionTokensDetails.mo
 
 module {
-    // User-facing type: what application code uses
     public type CompletionUsageCompletionTokensDetails = {
         /// When using Predicted Outputs, the number of tokens in the prediction that appeared in the completion. 
         accepted_prediction_tokens : ?Int;
@@ -15,26 +17,55 @@ module {
         rejected_prediction_tokens : ?Int;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CompletionUsageCompletionTokensDetails type
-        public type JSON = {
-            accepted_prediction_tokens : ?Int;
-            audio_tokens : ?Int;
-            reasoning_tokens : ?Int;
-            rejected_prediction_tokens : ?Int;
+        public func toCandidValue(value : CompletionUsageCompletionTokensDetails) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.accepted_prediction_tokens) {
+                case (?v__) List.add(buf, ("accepted_prediction_tokens", #Int(v__)));
+                case null ();
+            };
+            switch (value.audio_tokens) {
+                case (?v__) List.add(buf, ("audio_tokens", #Int(v__)));
+                case null ();
+            };
+            switch (value.reasoning_tokens) {
+                case (?v__) List.add(buf, ("reasoning_tokens", #Int(v__)));
+                case null ();
+            };
+            switch (value.rejected_prediction_tokens) {
+                case (?v__) List.add(buf, ("rejected_prediction_tokens", #Int(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CompletionUsageCompletionTokensDetails) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CompletionUsageCompletionTokensDetails = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CompletionUsageCompletionTokensDetails) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CompletionUsageCompletionTokensDetails =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let accepted_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "accepted_prediction_tokens")) {
+                        case (?accepted_prediction_tokens_field) ((switch (accepted_prediction_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case null null;
+                    };
+                    let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
+                        case (?audio_tokens_field) ((switch (audio_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case null null;
+                    };
+                    let reasoning_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "reasoning_tokens")) {
+                        case (?reasoning_tokens_field) ((switch (reasoning_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case null null;
+                    };
+                    let rejected_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "rejected_prediction_tokens")) {
+                        case (?rejected_prediction_tokens_field) ((switch (rejected_prediction_tokens_field.1) { case (#Int(i)) ?i; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        accepted_prediction_tokens;
+                        audio_tokens;
+                        reasoning_tokens;
+                        rejected_prediction_tokens;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

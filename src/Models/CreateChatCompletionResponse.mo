@@ -7,11 +7,13 @@ import { type CreateChatCompletionResponseChoicesInner; JSON = CreateChatComplet
 import { type CreateChatCompletionResponseObject; JSON = CreateChatCompletionResponseObject } "./CreateChatCompletionResponseObject";
 
 import { type ServiceTier; JSON = ServiceTier } "./ServiceTier";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateChatCompletionResponse.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateChatCompletionResponse = {
         /// A unique identifier for the chat completion.
         id : Text;
@@ -28,39 +30,76 @@ module {
         usage : ?CompletionUsage;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateChatCompletionResponse type
-        public type JSON = {
-            id : Text;
-            choices : [CreateChatCompletionResponseChoicesInner];
-            created : Int;
-            model : Text;
-            service_tier : ?ServiceTier.JSON;
-            system_fingerprint : ?Text;
-            object_ : CreateChatCompletionResponseObject.JSON;
-            usage : ?CompletionUsage;
+        public func toCandidValue(value : CreateChatCompletionResponse) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("id", #Text(value.id)));
+            List.add(buf, ("choices", #Array(Array.map<CreateChatCompletionResponseChoicesInner, Candid.Candid>(value.choices, CreateChatCompletionResponseChoicesInner.toCandidValue))));
+            List.add(buf, ("created", #Int(value.created)));
+            List.add(buf, ("model", #Text(value.model)));
+            switch (value.service_tier) {
+                case (?v__) List.add(buf, ("service_tier", ServiceTier.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.system_fingerprint) {
+                case (?v__) List.add(buf, ("system_fingerprint", #Text(v__)));
+                case null ();
+            };
+            List.add(buf, ("object", CreateChatCompletionResponseObject.toCandidValue(value.object_)));
+            switch (value.usage) {
+                case (?v__) List.add(buf, ("usage", CompletionUsage.toCandidValue(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateChatCompletionResponse) : JSON = { value with
-            service_tier = do ? { ServiceTier.toJSON(value.service_tier!) };
-            object_ = CreateChatCompletionResponseObject.toJSON(value.object_);
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateChatCompletionResponse {
-            let ?object_ = CreateChatCompletionResponseObject.fromJSON(json.object_) else return null;
-            ?{ json with
-                service_tier = do ? { ServiceTier.fromJSON(json.service_tier!)! };
-                object_;
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateChatCompletionResponse) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionResponse =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let ?choices_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "choices") else return null;
+                    let ?choices = ((switch (choices_field.1) {
+                        case (#Array(xs__)) {
+                            let buf__ = List.empty<CreateChatCompletionResponseChoicesInner>();
+                            for (c__ in xs__.values()) {
+                                let ?m__ = CreateChatCompletionResponseChoicesInner.fromCandidValue(c__) else return null;
+                                List.add(buf__, m__);
+                            };
+                            ?List.toArray(buf__);
+                        };
+                        case _ null;
+                    })) else return null;
+                    let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
+                    let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case _ null })) else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model = ((switch (model_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let service_tier : ?ServiceTier = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "service_tier")) {
+                        case (?service_tier_field) (ServiceTier.fromCandidValue(service_tier_field.1));
+                        case null null;
+                    };
+                    let system_fingerprint : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "system_fingerprint")) {
+                        case (?system_fingerprint_field) ((switch (system_fingerprint_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object_ = (CreateChatCompletionResponseObject.fromCandidValue(object__field.1)) else return null;
+                    let usage : ?CompletionUsage = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage")) {
+                        case (?usage_field) (CompletionUsage.fromCandidValue(usage_field.1));
+                        case null null;
+                    };
+                    ?{
+                        id;
+                        choices;
+                        created;
+                        model;
+                        service_tier;
+                        system_fingerprint;
+                        object_;
+                        usage;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

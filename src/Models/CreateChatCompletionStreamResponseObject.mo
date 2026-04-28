@@ -1,34 +1,31 @@
 /// The object type, which is always `chat.completion.chunk`.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateChatCompletionStreamResponseObject.mo
 /// Enum values: #chat_completion_chunk
 
 module {
-    // User-facing type: type-safe variants for application code
     public type CreateChatCompletionStreamResponseObject = {
         #chat_completion_chunk;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateChatCompletionStreamResponseObject type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateChatCompletionStreamResponseObject) : JSON =
+        public func toCandidValue(value : CreateChatCompletionStreamResponseObject) : Candid.Candid =
             switch (value) {
-                case (#chat_completion_chunk) "chat.completion.chunk";
+                case (#chat_completion_chunk) #Text("chat.completion.chunk");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateChatCompletionStreamResponseObject =
-            switch (json) {
-                case "chat.completion.chunk" ?#chat_completion_chunk;
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionStreamResponseObject =
+            switch (candid) {
+                case (#Text("chat.completion.chunk")) ?#chat_completion_chunk;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : CreateChatCompletionStreamResponseObject) : ?Text = null;
-    }
-}
+        public func toText(value : CreateChatCompletionStreamResponseObject) : Text =
+            switch (value) {
+                case (#chat_completion_chunk) "chat.completion.chunk";
+            };
+    };
+};

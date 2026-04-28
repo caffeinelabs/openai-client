@@ -2,34 +2,44 @@
 import { type CreateModerationRequestInput; JSON = CreateModerationRequestInput } "./CreateModerationRequestInput";
 
 import { type CreateModerationRequestModel; JSON = CreateModerationRequestModel } "./CreateModerationRequestModel";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // CreateModerationRequest.mo
 
 module {
-    // User-facing type: what application code uses
     public type CreateModerationRequest = {
         input : CreateModerationRequestInput;
         model : ?CreateModerationRequestModel;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer CreateModerationRequest type
-        public type JSON = {
-            input : CreateModerationRequestInput;
-            model : ?CreateModerationRequestModel;
+        public func toCandidValue(value : CreateModerationRequest) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            List.add(buf, ("input", CreateModerationRequestInput.toCandidValue(value.input)));
+            switch (value.model) {
+                case (?v__) List.add(buf, ("model", CreateModerationRequestModel.toCandidValue(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : CreateModerationRequest) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?CreateModerationRequest = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : CreateModerationRequest) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationRequest =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let ?input_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
+                    let ?input = (CreateModerationRequestInput.fromCandidValue(input_field.1)) else return null;
+                    let model : ?CreateModerationRequestModel = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model")) {
+                        case (?model_field) (CreateModerationRequestModel.fromCandidValue(model_field.1));
+                        case null null;
+                    };
+                    ?{
+                        input;
+                        model;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

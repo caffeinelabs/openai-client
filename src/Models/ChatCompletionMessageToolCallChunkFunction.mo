@@ -1,8 +1,10 @@
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionMessageToolCallChunkFunction.mo
 
 module {
-    // User-facing type: what application code uses
     public type ChatCompletionMessageToolCallChunkFunction = {
         /// The name of the function to call.
         name : ?Text;
@@ -10,24 +12,37 @@ module {
         arguments : ?Text;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionMessageToolCallChunkFunction type
-        public type JSON = {
-            name : ?Text;
-            arguments : ?Text;
+        public func toCandidValue(value : ChatCompletionMessageToolCallChunkFunction) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.name) {
+                case (?v__) List.add(buf, ("name", #Text(v__)));
+                case null ();
+            };
+            switch (value.arguments) {
+                case (?v__) List.add(buf, ("arguments", #Text(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionMessageToolCallChunkFunction) : JSON = value;
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionMessageToolCallChunkFunction = ?json;
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : ChatCompletionMessageToolCallChunkFunction) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionMessageToolCallChunkFunction =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let name : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name")) {
+                        case (?name_field) ((switch (name_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let arguments : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "arguments")) {
+                        case (?arguments_field) ((switch (arguments_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    ?{
+                        name;
+                        arguments;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

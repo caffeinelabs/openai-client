@@ -1,40 +1,39 @@
 /// Deprecated. The current status of the file, which can be either `uploaded`, `processed`, or `error`.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // OpenAIFileStatus.mo
 /// Enum values: #uploaded, #processed, #error_
 
 module {
-    // User-facing type: type-safe variants for application code
     public type OpenAIFileStatus = {
         #uploaded;
         #processed;
         #error_;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer OpenAIFileStatus type
-        public type JSON = Text;
+        public func toCandidValue(value : OpenAIFileStatus) : Candid.Candid =
+            switch (value) {
+                case (#uploaded) #Text("uploaded");
+                case (#processed) #Text("processed");
+                case (#error_) #Text("error");
+            };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : OpenAIFileStatus) : JSON =
+        public func fromCandidValue(candid : Candid.Candid) : ?OpenAIFileStatus =
+            switch (candid) {
+                case (#Text("uploaded")) ?#uploaded;
+                case (#Text("processed")) ?#processed;
+                case (#Text("error")) ?#error_;
+                case _ null;
+            };
+
+        public func toText(value : OpenAIFileStatus) : Text =
             switch (value) {
                 case (#uploaded) "uploaded";
                 case (#processed) "processed";
                 case (#error_) "error";
             };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?OpenAIFileStatus =
-            switch (json) {
-                case "uploaded" ?#uploaded;
-                case "processed" ?#processed;
-                case "error" ?#error_;
-                case _ null;
-            };
-
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : OpenAIFileStatus) : ?Text = null;
-    }
-}
+    };
+};

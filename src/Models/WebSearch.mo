@@ -3,40 +3,49 @@
 import { type WebSearchContextSize; JSON = WebSearchContextSize } "./WebSearchContextSize";
 
 import { type WebSearchUserLocation; JSON = WebSearchUserLocation } "./WebSearchUserLocation";
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // WebSearch.mo
 
 module {
-    // User-facing type: what application code uses
     public type WebSearch = {
         user_location : ?WebSearchUserLocation;
         search_context_size : ?WebSearchContextSize;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer WebSearch type
-        public type JSON = {
-            user_location : ?WebSearchUserLocation;
-            search_context_size : ?WebSearchContextSize.JSON;
+        public func toCandidValue(value : WebSearch) : Candid.Candid {
+            let buf = List.empty<(Text, Candid.Candid)>();
+            switch (value.user_location) {
+                case (?v__) List.add(buf, ("user_location", WebSearchUserLocation.toCandidValue(v__)));
+                case null ();
+            };
+            switch (value.search_context_size) {
+                case (?v__) List.add(buf, ("search_context_size", WebSearchContextSize.toCandidValue(v__)));
+                case null ();
+            };
+            #Record(List.toArray(buf));
         };
 
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : WebSearch) : JSON = { value with
-            search_context_size = do ? { WebSearchContextSize.toJSON(value.search_context_size!) };
-        };
-
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?WebSearch {
-            ?{ json with
-                search_context_size = do ? { WebSearchContextSize.fromJSON(json.search_context_size!)! };
-            }
-        };
-
-        // Pre-flight validation (`diagnostics=true`): surface generator-known wire-format
-        // gaps as `?Text`, so api.mustache can `throw Error.reject(msg)` instead of letting
-        // bad JSON reach the upstream API and come back as an opaque 4xx.
-        public func validate(_value : WebSearch) : ?Text = null;
-    }
-}
+        public func fromCandidValue(candid : Candid.Candid) : ?WebSearch =
+            switch (candid) {
+                case (#Record(fields)) {
+                    let user_location : ?WebSearchUserLocation = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user_location")) {
+                        case (?user_location_field) (WebSearchUserLocation.fromCandidValue(user_location_field.1));
+                        case null null;
+                    };
+                    let search_context_size : ?WebSearchContextSize = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "search_context_size")) {
+                        case (?search_context_size_field) (WebSearchContextSize.fromCandidValue(search_context_size_field.1));
+                        case null null;
+                    };
+                    ?{
+                        user_location;
+                        search_context_size;
+                    };
+                };
+                case _ null;
+            };
+    };
+};

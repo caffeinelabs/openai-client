@@ -1,34 +1,31 @@
 /// The role of the messages author, in this case `developer`.
+import { Candid } "mo:serde-core";
+import Array "mo:core/Array";
+import List "mo:core/List";
 
 // ChatCompletionRequestDeveloperMessageRole.mo
 /// Enum values: #developer
 
 module {
-    // User-facing type: type-safe variants for application code
     public type ChatCompletionRequestDeveloperMessageRole = {
         #developer;
     };
 
-    // JSON sub-module: everything needed for JSON serialization
     public module JSON {
-        // JSON-facing Motoko type: mirrors JSON structure
-        // Named "JSON" to avoid shadowing the outer ChatCompletionRequestDeveloperMessageRole type
-        public type JSON = Text;
-
-        // Convert User-facing type to JSON-facing Motoko type
-        public func toJSON(value : ChatCompletionRequestDeveloperMessageRole) : JSON =
+        public func toCandidValue(value : ChatCompletionRequestDeveloperMessageRole) : Candid.Candid =
             switch (value) {
-                case (#developer) "developer";
+                case (#developer) #Text("developer");
             };
 
-        // Convert JSON-facing Motoko type to User-facing type
-        public func fromJSON(json : JSON) : ?ChatCompletionRequestDeveloperMessageRole =
-            switch (json) {
-                case "developer" ?#developer;
+        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestDeveloperMessageRole =
+            switch (candid) {
+                case (#Text("developer")) ?#developer;
                 case _ null;
             };
 
-        // Pre-flight validation (`diagnostics=true`): enums are always valid.
-        public func validate(_value : ChatCompletionRequestDeveloperMessageRole) : ?Text = null;
-    }
-}
+        public func toText(value : ChatCompletionRequestDeveloperMessageRole) : Text =
+            switch (value) {
+                case (#developer) "developer";
+            };
+    };
+};
