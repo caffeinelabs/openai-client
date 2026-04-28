@@ -4,6 +4,19 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.1) — 2026-04-28
+
+### Fixed
+
+- Response-side: replaced the lossy `JSON.fromText → Candid.decodeOne(blob, [], null)`
+  blob roundtrip with `JSON.toCandid(text)` (Candid value direct, names preserved).
+  The old path hashed JSON field names through Candid wire format and required an
+  exhaustive keys list to recover them; without one, every `T.fromCandidValue` call
+  failed `Array.find` on `"id"` / `"choices"` / `"role"` / etc. Symptom in 0.2.0:
+  `HTTP 200: Failed to convert response to CreateChatCompletionResponse` even though
+  the server's response was perfectly valid. Symmetric to the request-side fix that
+  shipped in 0.2.0 (which already used `JSON.fromCandid`, the inverse direct path).
+
 ## [0.2.0](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.0) — 2026-04-28
 
 ### Changed (BREAKING)
