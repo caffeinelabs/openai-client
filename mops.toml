@@ -3,7 +3,7 @@ moc = "1.4.1"
 
 [package]
 name = "openai-client"
-version = "0.2.3"
+version = "0.2.4"
 description = "Generated Motoko client for OpenAI API"
 repository = "https://github.com/caffeinelabs/openai-client"
 license = "Apache-2.0"

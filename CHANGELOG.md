@@ -4,6 +4,33 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.4) — 2026-04-30
+
+### Fixed
+
+- **`AudioApi.transcribeAudio` Blob responses** — the primitive-return
+  dispatch now emits `case (#Blob(b__)) b__;` for `Blob`-typed endpoints.
+  Previously fell through to the `#Int` arm and failed to type-check.
+- **JSON field names with punctuation** sanitize cleanly to Motoko
+  identifiers. The OpenAI Moderation schema's `hate/threatening` (and
+  similar slash/dot/space-bearing names) now becomes `hate_threatening`
+  in Motoko; the JSON wire shape is preserved.
+- **`Map<K, V>` array items where V is primitive** no longer emit
+  `T.toCandidValue` calls on the unsupported value type. The Candid
+  partials gate the method dispatch on `complexType`.
+- **Variant tags whose Motoko-derived name would contain brackets or
+  parens** fall back to positional `#one_of_<i>`. Previously affected
+  `CreateCompletionRequestPrompt` (`#_[Int]` was emitted as a literal
+  variant tag and was not valid Motoko).
+- **int64 fields** no longer emit duplicate Candid case branches
+  (`#Int(v__)#Int(v__)`). The `isLong` partial is now guarded by
+  `^isInteger` across all seven candid_* templates.
+
+### Note
+
+These are codegen fixes; no public API changed. `mops publish` now
+succeeds without `--no-docs` for this surface.
+
 ## [0.2.3](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.3) — 2026-04-30
 
 ### Added
