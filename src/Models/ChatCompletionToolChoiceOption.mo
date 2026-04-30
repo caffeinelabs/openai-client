@@ -23,35 +23,19 @@ module {
     };
 
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : ChatCompletionToolChoiceOption) : Text =
-            switch (value) {
-                case (#ChatCompletionToolChoiceOptionOneOf(v)) (switch (ChatCompletionToolChoiceOptionOneOf.toCandidValue(v)) { case (#Text(s)) s; case _ Runtime.unreachable() });
-                case (#ChatCompletionNamedToolChoice(v)) Runtime.unreachable();
-            };
+        // Generic oneOf is rare on the surfaces we care about (chat / tweet
+        // bodies use discriminator-oneOf or string-flatten). The branches here
+        // can mix primitives, parametrised types, and arrays — none of which
+        // dispatch cleanly via `OneOf<ChatCompletionToolChoiceOptionOneOf,ChatCompletionNamedToolChoice>.toCandidValue(v)` (Text isn't a
+        // module; `Map<K,V>` and `[[Int]]` aren't dottable identifiers). To
+        // keep the file type-checking (so `mops publish` can extract docs),
+        // stub all three converters with `Runtime.unreachable()`. Real
+        // implementations are a follow-up — primitive dispatch + recursive
+        // partial reuse for arrays/maps inside oneOf branches.
+        public func toText(_value : ChatCompletionToolChoiceOption) : Text = Runtime.unreachable();
 
-        public func toCandidValue(value : ChatCompletionToolChoiceOption) : Candid.Candid =
-            switch (value) {
-                case (#ChatCompletionToolChoiceOptionOneOf(v)) #Variant(("ChatCompletionToolChoiceOptionOneOf", ChatCompletionToolChoiceOptionOneOf.toCandidValue(v)));
-                case (#ChatCompletionNamedToolChoice(v)) #Variant(("ChatCompletionNamedToolChoice", ChatCompletionNamedToolChoice.toCandidValue(v)));
-            };
+        public func toCandidValue(_value : ChatCompletionToolChoiceOption) : Candid.Candid = Runtime.unreachable();
 
-        public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionToolChoiceOption =
-            switch (candid) {
-                case (#Variant(tagAndVal)) {
-                    switch (tagAndVal.0) {
-                        case ("ChatCompletionToolChoiceOptionOneOf") {
-                            let ?inner = ChatCompletionToolChoiceOptionOneOf.fromCandidValue(tagAndVal.1) else return null;
-                            ?#ChatCompletionToolChoiceOptionOneOf(inner)
-                        };
-                        case ("ChatCompletionNamedToolChoice") {
-                            let ?inner = ChatCompletionNamedToolChoice.fromCandidValue(tagAndVal.1) else return null;
-                            ?#ChatCompletionNamedToolChoice(inner)
-                        };
-                        case _ null;
-                    };
-                };
-                case _ null;
-            };
+        public func fromCandidValue(_candid : Candid.Candid) : ?ChatCompletionToolChoiceOption = Runtime.unreachable();
     };
 };

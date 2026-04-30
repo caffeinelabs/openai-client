@@ -18,41 +18,19 @@ module {
     };
 
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : CreateModerationRequestInput) : Text =
-            switch (value) {
-                case (#one_of_0(v)) Runtime.unreachable();
-                case (#one_of_1(v)) Runtime.unreachable();
-                case (#CreateModerationRequestInputOneOfInner(v)) Runtime.unreachable();
-            };
+        // Generic oneOf is rare on the surfaces we care about (chat / tweet
+        // bodies use discriminator-oneOf or string-flatten). The branches here
+        // can mix primitives, parametrised types, and arrays — none of which
+        // dispatch cleanly via `OneOf<string,array,array>.toCandidValue(v)` (Text isn't a
+        // module; `Map<K,V>` and `[[Int]]` aren't dottable identifiers). To
+        // keep the file type-checking (so `mops publish` can extract docs),
+        // stub all three converters with `Runtime.unreachable()`. Real
+        // implementations are a follow-up — primitive dispatch + recursive
+        // partial reuse for arrays/maps inside oneOf branches.
+        public func toText(_value : CreateModerationRequestInput) : Text = Runtime.unreachable();
 
-        public func toCandidValue(value : CreateModerationRequestInput) : Candid.Candid =
-            switch (value) {
-                case (#one_of_0(v)) #Variant(("one_of_0", Text.toCandidValue(v)));
-                case (#one_of_1(v)) #Variant(("one_of_1", [Text].toCandidValue(v)));
-                case (#CreateModerationRequestInputOneOfInner(v)) #Variant(("CreateModerationRequestInputOneOfInner", [CreateModerationRequestInputOneOfInner].toCandidValue(v)));
-            };
+        public func toCandidValue(_value : CreateModerationRequestInput) : Candid.Candid = Runtime.unreachable();
 
-        public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationRequestInput =
-            switch (candid) {
-                case (#Variant(tagAndVal)) {
-                    switch (tagAndVal.0) {
-                        case ("one_of_0") {
-                            let ?inner = Text.fromCandidValue(tagAndVal.1) else return null;
-                            ?#one_of_0(inner)
-                        };
-                        case ("one_of_1") {
-                            let ?inner = [Text].fromCandidValue(tagAndVal.1) else return null;
-                            ?#one_of_1(inner)
-                        };
-                        case ("CreateModerationRequestInputOneOfInner") {
-                            let ?inner = [CreateModerationRequestInputOneOfInner].fromCandidValue(tagAndVal.1) else return null;
-                            ?#CreateModerationRequestInputOneOfInner(inner)
-                        };
-                        case _ null;
-                    };
-                };
-                case _ null;
-            };
+        public func fromCandidValue(_candid : Candid.Candid) : ?CreateModerationRequestInput = Runtime.unreachable();
     };
 };

@@ -24,35 +24,19 @@ module {
     };
 
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : CreateTranscription200Response) : Text =
-            switch (value) {
-                case (#CreateTranscriptionResponseJson(v)) Runtime.unreachable();
-                case (#CreateTranscriptionResponseVerboseJson(v)) Runtime.unreachable();
-            };
+        // Generic oneOf is rare on the surfaces we care about (chat / tweet
+        // bodies use discriminator-oneOf or string-flatten). The branches here
+        // can mix primitives, parametrised types, and arrays — none of which
+        // dispatch cleanly via `OneOf<CreateTranscriptionResponseJson,CreateTranscriptionResponseVerboseJson>.toCandidValue(v)` (Text isn't a
+        // module; `Map<K,V>` and `[[Int]]` aren't dottable identifiers). To
+        // keep the file type-checking (so `mops publish` can extract docs),
+        // stub all three converters with `Runtime.unreachable()`. Real
+        // implementations are a follow-up — primitive dispatch + recursive
+        // partial reuse for arrays/maps inside oneOf branches.
+        public func toText(_value : CreateTranscription200Response) : Text = Runtime.unreachable();
 
-        public func toCandidValue(value : CreateTranscription200Response) : Candid.Candid =
-            switch (value) {
-                case (#CreateTranscriptionResponseJson(v)) #Variant(("CreateTranscriptionResponseJson", CreateTranscriptionResponseJson.toCandidValue(v)));
-                case (#CreateTranscriptionResponseVerboseJson(v)) #Variant(("CreateTranscriptionResponseVerboseJson", CreateTranscriptionResponseVerboseJson.toCandidValue(v)));
-            };
+        public func toCandidValue(_value : CreateTranscription200Response) : Candid.Candid = Runtime.unreachable();
 
-        public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscription200Response =
-            switch (candid) {
-                case (#Variant(tagAndVal)) {
-                    switch (tagAndVal.0) {
-                        case ("CreateTranscriptionResponseJson") {
-                            let ?inner = CreateTranscriptionResponseJson.fromCandidValue(tagAndVal.1) else return null;
-                            ?#CreateTranscriptionResponseJson(inner)
-                        };
-                        case ("CreateTranscriptionResponseVerboseJson") {
-                            let ?inner = CreateTranscriptionResponseVerboseJson.fromCandidValue(tagAndVal.1) else return null;
-                            ?#CreateTranscriptionResponseVerboseJson(inner)
-                        };
-                        case _ null;
-                    };
-                };
-                case _ null;
-            };
+        public func fromCandidValue(_candid : Candid.Candid) : ?CreateTranscription200Response = Runtime.unreachable();
     };
 };

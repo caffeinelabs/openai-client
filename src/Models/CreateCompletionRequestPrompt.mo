@@ -13,51 +13,23 @@ module {
         #one_of_0 : Text;
         #one_of_1 : [Text];
         #one_of_2 : [Int];
-        #_[Int] : [[Int]];
+        #_Int_ : [[Int]];
     };
 
     public module JSON {
-        // Convert oneOf variant to Text for URL parameters
-        public func toText(value : CreateCompletionRequestPrompt) : Text =
-            switch (value) {
-                case (#one_of_0(v)) Runtime.unreachable();
-                case (#one_of_1(v)) Runtime.unreachable();
-                case (#one_of_2(v)) Runtime.unreachable();
-                case (#_[Int](v)) Runtime.unreachable();
-            };
+        // Generic oneOf is rare on the surfaces we care about (chat / tweet
+        // bodies use discriminator-oneOf or string-flatten). The branches here
+        // can mix primitives, parametrised types, and arrays — none of which
+        // dispatch cleanly via `OneOf<string,array,array,array>.toCandidValue(v)` (Text isn't a
+        // module; `Map<K,V>` and `[[Int]]` aren't dottable identifiers). To
+        // keep the file type-checking (so `mops publish` can extract docs),
+        // stub all three converters with `Runtime.unreachable()`. Real
+        // implementations are a follow-up — primitive dispatch + recursive
+        // partial reuse for arrays/maps inside oneOf branches.
+        public func toText(_value : CreateCompletionRequestPrompt) : Text = Runtime.unreachable();
 
-        public func toCandidValue(value : CreateCompletionRequestPrompt) : Candid.Candid =
-            switch (value) {
-                case (#one_of_0(v)) #Variant(("one_of_0", Text.toCandidValue(v)));
-                case (#one_of_1(v)) #Variant(("one_of_1", [Text].toCandidValue(v)));
-                case (#one_of_2(v)) #Variant(("one_of_2", [Int].toCandidValue(v)));
-                case (#_[Int](v)) #Variant(("_[Int]", [[Int]].toCandidValue(v)));
-            };
+        public func toCandidValue(_value : CreateCompletionRequestPrompt) : Candid.Candid = Runtime.unreachable();
 
-        public func fromCandidValue(candid : Candid.Candid) : ?CreateCompletionRequestPrompt =
-            switch (candid) {
-                case (#Variant(tagAndVal)) {
-                    switch (tagAndVal.0) {
-                        case ("one_of_0") {
-                            let ?inner = Text.fromCandidValue(tagAndVal.1) else return null;
-                            ?#one_of_0(inner)
-                        };
-                        case ("one_of_1") {
-                            let ?inner = [Text].fromCandidValue(tagAndVal.1) else return null;
-                            ?#one_of_1(inner)
-                        };
-                        case ("one_of_2") {
-                            let ?inner = [Int].fromCandidValue(tagAndVal.1) else return null;
-                            ?#one_of_2(inner)
-                        };
-                        case ("_[Int]") {
-                            let ?inner = [[Int]].fromCandidValue(tagAndVal.1) else return null;
-                            ?#_[Int](inner)
-                        };
-                        case _ null;
-                    };
-                };
-                case _ null;
-            };
+        public func fromCandidValue(_candid : Candid.Candid) : ?CreateCompletionRequestPrompt = Runtime.unreachable();
     };
 };

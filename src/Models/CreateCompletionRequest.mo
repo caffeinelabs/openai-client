@@ -104,7 +104,7 @@ module {
                 case null ();
             };
             switch (value.seed) {
-                case (?v__) List.add(buf, ("seed", #Int(v__)#Int(v__)));
+                case (?v__) List.add(buf, ("seed", #Int(v__)));
                 case null ();
             };
             switch (value.stop) {
@@ -190,7 +190,7 @@ module {
                         case null null;
                     };
                     let seed : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seed")) {
-                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })(switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
+                        case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
                     let stop : ?StopConfiguration = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stop")) {
@@ -246,9 +246,14 @@ module {
             };
     };
 
-    /// Re-export of `JSON.init` at the outer module level so callers using the
-    /// whole-module import pattern (`import T "...";`) can write `T.init {…}`
-    /// directly, mirroring the destructure-pattern (`{ type T; JSON = T }`)
-    /// shorthand `T.init {…}` that resolves through the JSON alias.
+    /// Re-export of `JSON.init` at the outer module level. Three import shapes
+    /// all reach the same function:
+    ///
+    ///   - `import T "...";                                     T.init {…}`     // whole-module
+    ///   - `import { type T; JSON = T } "...";                  T.init {…}`     // JSON-alias
+    ///   - `import { type T; JSON = T; init = myInit } "...";   myInit {…}`     // explicit rename
+    ///
+    /// The third form is handy when several models would all be reachable
+    /// as `T.init` and you want each bound to a distinct local name.
     public let init = JSON.init;
 };

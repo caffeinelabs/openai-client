@@ -56,7 +56,7 @@ module {
                 case null ();
             };
             switch (value.top_logprobs) {
-                case (?v__) List.add(buf, ("top_logprobs", #Array(Array.map<Map<Text, Float>, Candid.Candid>(v__, Map<Text, Float>.toCandidValue))));
+                case (?v__) List.add(buf, ("top_logprobs", #Array(Array.map<Map<Text, Float>, Candid.Candid>(v__, func(_ : Map<Text, Float>) : Candid.Candid = Runtime.unreachable()))));
                 case null ();
             };
             #Record(List.toArray(buf));
@@ -112,7 +112,7 @@ module {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Map<Text, Float>>();
                             for (c__ in xs__.values()) {
-                                let ?m__ = Map<Text, Float>.fromCandidValue(c__) else return null;
+                                let m__ : Map<Text, Float> = Runtime.unreachable();
                                 List.add(buf__, m__);
                             };
                             ?List.toArray(buf__);
@@ -132,9 +132,14 @@ module {
             };
     };
 
-    /// Re-export of `JSON.init` at the outer module level so callers using the
-    /// whole-module import pattern (`import T "...";`) can write `T.init {…}`
-    /// directly, mirroring the destructure-pattern (`{ type T; JSON = T }`)
-    /// shorthand `T.init {…}` that resolves through the JSON alias.
+    /// Re-export of `JSON.init` at the outer module level. Three import shapes
+    /// all reach the same function:
+    ///
+    ///   - `import T "...";                                     T.init {…}`     // whole-module
+    ///   - `import { type T; JSON = T } "...";                  T.init {…}`     // JSON-alias
+    ///   - `import { type T; JSON = T; init = myInit } "...";   myInit {…}`     // explicit rename
+    ///
+    /// The third form is handy when several models would all be reachable
+    /// as `T.init` and you want each bound to a distinct local name.
     public let init = JSON.init;
 };
