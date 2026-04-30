@@ -3,11 +3,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateModerationResponseResultsInnerCategories.mo
 
 module {
-    public type CreateModerationResponseResultsInnerCategories = {
+    /// The required-fields slice of CreateModerationResponseResultsInnerCategories — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// Content that expresses, incites, or promotes hate based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste. Hateful content aimed at non-protected groups (e.g., chess players) is harassment.
         hate : Bool;
         /// Hateful content that also includes violence or serious harm towards the targeted group based on race, gender, ethnicity, religion, nationality, sexual orientation, disability status, or caste.
@@ -16,10 +20,6 @@ module {
         harassment : Bool;
         /// Harassment content that also includes violence or serious harm towards any target.
         harassment/threatening : Bool;
-        /// Content that includes instructions or advice that facilitate the planning or execution of wrongdoing, or that gives advice or instruction on how to commit illicit acts. For example, \"how to shoplift\" would fit this category.
-        illicit : ?Bool;
-        /// Content that includes instructions or advice that facilitate the planning or execution of wrongdoing that also includes violence, or that gives advice or instruction on the procurement of any weapon.
-        illicit/violent : ?Bool;
         /// Content that promotes, encourages, or depicts acts of self-harm, such as suicide, cutting, and eating disorders.
         self_harm : Bool;
         /// Content where the speaker expresses that they are engaging or intend to engage in acts of self-harm, such as suicide, cutting, and eating disorders.
@@ -36,7 +36,30 @@ module {
         violence/graphic : Bool;
     };
 
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateModerationResponseResultsInnerCategories as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        illicit : ?Bool;
+        illicit/violent : ?Bool;
+    };
+
+    public type CreateModerationResponseResultsInnerCategories = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateModerationResponseResultsInnerCategories from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateModerationResponseResultsInnerCategories.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateModerationResponseResultsInnerCategories {
+            let ?res = from_candid(to_candid(required)) : ?CreateModerationResponseResultsInnerCategories else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateModerationResponseResultsInnerCategories) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("hate", #Bool(value.hate)));

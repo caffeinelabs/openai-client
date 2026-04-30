@@ -4,6 +4,7 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // VoiceIdsShared.mo
 // anyOf / oneOf where every branch produces a JSON string on the wire — flattened to `Text`.

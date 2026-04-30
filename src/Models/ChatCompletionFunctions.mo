@@ -4,20 +4,43 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // ChatCompletionFunctions.mo
 
 module {
-    public type ChatCompletionFunctions = {
-        /// A description of what the function does, used by the model to choose when and how to call the function.
-        description : ?Text;
+    /// The required-fields slice of ChatCompletionFunctions — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// The name of the function to be called. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64.
         name : Text;
-        /// The parameters the functions accepts, described as a JSON Schema object. See the [guide](/docs/guides/function-calling) for examples, and the [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for documentation about the format.   Omitting `parameters` defines a function with an empty parameter list.
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express ChatCompletionFunctions as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        description : ?Text;
         parameters : ?Map<Text, Text>;
     };
 
+    public type ChatCompletionFunctions = Required and Optional;
+
     public module JSON {
+        // `init` constructs a ChatCompletionFunctions from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { ChatCompletionFunctions.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : ChatCompletionFunctions {
+            let ?res = from_candid(to_candid(required)) : ?ChatCompletionFunctions else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : ChatCompletionFunctions) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.description) {

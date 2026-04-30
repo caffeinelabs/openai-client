@@ -3,22 +3,43 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // WebSearchLocation.mo
 
 module {
-    public type WebSearchLocation = {
-        /// The two-letter  [ISO country code](https://en.wikipedia.org/wiki/ISO_3166-1) of the user, e.g. `US`. 
+    /// The required-fields slice of WebSearchLocation — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express WebSearchLocation as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         country : ?Text;
-        /// Free text input for the region of the user, e.g. `California`. 
         region_ : ?Text;
-        /// Free text input for the city of the user, e.g. `San Francisco`. 
         city : ?Text;
-        /// The [IANA timezone](https://timeapi.io/documentation/iana-timezones)  of the user, e.g. `America/Los_Angeles`. 
         timezone : ?Text;
     };
 
+    public type WebSearchLocation = Required and Optional;
+
     public module JSON {
+        // `init` constructs a WebSearchLocation from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { WebSearchLocation.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : WebSearchLocation {
+            let ?res = from_candid(to_candid(required)) : ?WebSearchLocation else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : WebSearchLocation) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.country) {

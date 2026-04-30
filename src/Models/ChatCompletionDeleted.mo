@@ -4,11 +4,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // ChatCompletionDeleted.mo
 
 module {
-    public type ChatCompletionDeleted = {
+    /// The required-fields slice of ChatCompletionDeleted — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         object_ : ChatCompletionDeletedObject;
         /// The ID of the chat completion that was deleted.
         id : Text;
@@ -16,7 +20,28 @@ module {
         deleted : Bool;
     };
 
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express ChatCompletionDeleted as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+    };
+
+    public type ChatCompletionDeleted = Required and Optional;
+
     public module JSON {
+        // `init` constructs a ChatCompletionDeleted from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { ChatCompletionDeleted.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : ChatCompletionDeleted {
+            let ?res = from_candid(to_candid(required)) : ?ChatCompletionDeleted else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : ChatCompletionDeleted) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("object", ChatCompletionDeletedObject.toCandidValue(value.object_)));

@@ -4,16 +4,40 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // UpdateChatCompletionRequest.mo
 
 module {
-    public type UpdateChatCompletionRequest = {
-        /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information about the object in a structured format, and querying for objects via API or the dashboard.   Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of 512 characters. 
+    /// The required-fields slice of UpdateChatCompletionRequest — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express UpdateChatCompletionRequest as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         metadata : ?Map<Text, Text>;
     };
 
+    public type UpdateChatCompletionRequest = Required and Optional;
+
     public module JSON {
+        // `init` constructs a UpdateChatCompletionRequest from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { UpdateChatCompletionRequest.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : UpdateChatCompletionRequest {
+            let ?res = from_candid(to_candid(required)) : ?UpdateChatCompletionRequest else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : UpdateChatCompletionRequest) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.metadata) {

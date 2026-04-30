@@ -11,11 +11,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateChatCompletionStreamResponse.mo
 
 module {
-    public type CreateChatCompletionStreamResponse = {
+    /// The required-fields slice of CreateChatCompletionStreamResponse — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// A unique identifier for the chat completion. Each chunk has the same ID.
         id : Text;
         /// A list of chat completion choices. Can contain more than one elements if `n` is greater than 1. Can also be empty for the last chunk if you set `stream_options: {\"include_usage\": true}`. 
@@ -24,14 +28,34 @@ module {
         created : Int;
         /// The model to generate the completion.
         model : Text;
-        service_tier : ?ServiceTier;
-        /// This fingerprint represents the backend configuration that the model runs with. Can be used in conjunction with the `seed` request parameter to understand when backend changes have been made that might impact determinism. 
-        system_fingerprint : ?Text;
         object_ : CreateChatCompletionStreamResponseObject;
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateChatCompletionStreamResponse as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        service_tier : ?ServiceTier;
+        system_fingerprint : ?Text;
         usage : ?CompletionUsage;
     };
 
+    public type CreateChatCompletionStreamResponse = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateChatCompletionStreamResponse from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateChatCompletionStreamResponse.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateChatCompletionStreamResponse {
+            let ?res = from_candid(to_candid(required)) : ?CreateChatCompletionStreamResponse else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateChatCompletionStreamResponse) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("id", #Text(value.id)));

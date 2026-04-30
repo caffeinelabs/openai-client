@@ -7,16 +7,41 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // WebSearch.mo
 
 module {
-    public type WebSearch = {
+    /// The required-fields slice of WebSearch — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express WebSearch as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         user_location : ?WebSearchUserLocation;
         search_context_size : ?WebSearchContextSize;
     };
 
+    public type WebSearch = Required and Optional;
+
     public module JSON {
+        // `init` constructs a WebSearch from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { WebSearch.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : WebSearch {
+            let ?res = from_candid(to_candid(required)) : ?WebSearch else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : WebSearch) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.user_location) {

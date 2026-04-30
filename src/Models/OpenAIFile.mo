@@ -9,29 +9,52 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // OpenAIFile.mo
 
 module {
-    public type OpenAIFile = {
+    /// The required-fields slice of OpenAIFile — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// The file identifier, which can be referenced in the API endpoints.
         id : Text;
         /// The size of the file, in bytes.
         bytes : Int;
         /// The Unix timestamp (in seconds) for when the file was created.
         created_at : Int;
-        /// The Unix timestamp (in seconds) for when the file will expire.
-        expires_at : ?Int;
         /// The name of the file.
         filename : Text;
         object_ : OpenAIFileObject;
         purpose : OpenAIFilePurpose;
         status : OpenAIFileStatus;
-        /// Deprecated. For details on why a fine-tuning training file failed validation, see the `error` field on `fine_tuning.job`.
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express OpenAIFile as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        expires_at : ?Int;
         status_details : ?Text;
     };
 
+    public type OpenAIFile = Required and Optional;
+
     public module JSON {
+        // `init` constructs a OpenAIFile from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { OpenAIFile.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : OpenAIFile {
+            let ?res = from_candid(to_candid(required)) : ?OpenAIFile else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : OpenAIFile) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("id", #Text(value.id)));

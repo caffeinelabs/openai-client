@@ -8,23 +8,46 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateSpeechRequest.mo
 
 module {
-    public type CreateSpeechRequest = {
+    /// The required-fields slice of CreateSpeechRequest — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         model : CreateSpeechRequestModel;
         /// The text to generate audio for. The maximum length is 4096 characters.
         input : Text;
-        /// Control the voice of your generated audio with additional instructions. Does not work with `tts-1` or `tts-1-hd`.
-        instructions : ?Text;
         voice : VoiceIdsShared;
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateSpeechRequest as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        instructions : ?Text;
         response_format : ?CreateSpeechRequestResponseFormat;
-        /// The speed of the generated audio. Select a value from `0.25` to `4.0`. `1.0` is the default.
         speed : ?Float;
     };
 
+    public type CreateSpeechRequest = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateSpeechRequest from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateSpeechRequest.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateSpeechRequest {
+            let ?res = from_candid(to_candid(required)) : ?CreateSpeechRequest else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateSpeechRequest) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("model", CreateSpeechRequestModel.toCandidValue(value.model)));

@@ -4,22 +4,46 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // ChatCompletionTokenLogprob.mo
 
 module {
-    public type ChatCompletionTokenLogprob = {
+    /// The required-fields slice of ChatCompletionTokenLogprob — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// The token.
         token : Text;
         /// The log probability of this token, if it is within the top 20 most likely tokens. Otherwise, the value `-9999.0` is used to signify that the token is very unlikely.
         logprob : Float;
-        /// A list of integers representing the UTF-8 bytes representation of the token. Useful in instances where characters are represented by multiple tokens and their byte representations must be combined to generate the correct text representation. Can be `null` if there is no bytes representation for the token.
-        bytes : ?[Int];
         /// List of the most likely tokens and their log probability, at this token position. In rare cases, there may be fewer than the number of requested `top_logprobs` returned.
         top_logprobs : [ChatCompletionTokenLogprobTopLogprobsInner];
     };
 
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express ChatCompletionTokenLogprob as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        bytes : ?[Int];
+    };
+
+    public type ChatCompletionTokenLogprob = Required and Optional;
+
     public module JSON {
+        // `init` constructs a ChatCompletionTokenLogprob from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { ChatCompletionTokenLogprob.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : ChatCompletionTokenLogprob {
+            let ?res = from_candid(to_candid(required)) : ?ChatCompletionTokenLogprob else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : ChatCompletionTokenLogprob) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("token", #Text(value.token)));

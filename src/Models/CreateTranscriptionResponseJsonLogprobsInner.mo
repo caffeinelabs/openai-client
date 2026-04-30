@@ -2,20 +2,42 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateTranscriptionResponseJsonLogprobsInner.mo
 
 module {
-    public type CreateTranscriptionResponseJsonLogprobsInner = {
-        /// The token in the transcription.
+    /// The required-fields slice of CreateTranscriptionResponseJsonLogprobsInner — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateTranscriptionResponseJsonLogprobsInner as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         token : ?Text;
-        /// The log probability of the token.
         logprob : ?Float;
-        /// The bytes of the token.
         bytes : ?[Float];
     };
 
+    public type CreateTranscriptionResponseJsonLogprobsInner = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateTranscriptionResponseJsonLogprobsInner from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateTranscriptionResponseJsonLogprobsInner.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateTranscriptionResponseJsonLogprobsInner {
+            let ?res = from_candid(to_candid(required)) : ?CreateTranscriptionResponseJsonLogprobsInner else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateTranscriptionResponseJsonLogprobsInner) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.token) {

@@ -2,6 +2,7 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // ModelIdsSharedAnyOf.mo
 /// Enum values: #gpt_4_1, #gpt_4_1_mini, #gpt_4_1_nano, #gpt_4_1_2025_04_14, #gpt_4_1_mini_2025_04_14, #gpt_4_1_nano_2025_04_14, #o4_mini, #o4_mini_2025_04_16, #o3, #o3_2025_04_16, #o3_mini, #o3_mini_2025_01_31, #o1, #o1_2024_12_17, #o1_preview, #o1_preview_2024_09_12, #o1_mini, #o1_mini_2024_09_12, #gpt_4o, #gpt_4o_2024_11_20, #gpt_4o_2024_08_06, #gpt_4o_2024_05_13, #gpt_4o_audio_preview, #gpt_4o_audio_preview_2024_10_01, #gpt_4o_audio_preview_2024_12_17, #gpt_4o_mini_audio_preview, #gpt_4o_mini_audio_preview_2024_12_17, #gpt_4o_search_preview, #gpt_4o_mini_search_preview, #gpt_4o_search_preview_2025_03_11, #gpt_4o_mini_search_preview_2025_03_11, #chatgpt_4o_latest, #gpt_4o_mini, #gpt_4o_mini_2024_07_18, #gpt_4_turbo, #gpt_4_turbo_2024_04_09, #gpt_4_0125_preview, #gpt_4_turbo_preview, #gpt_4_1106_preview, #gpt_4_vision_preview, #gpt_4, #gpt_4_0314, #gpt_4_0613, #gpt_4_32k, #gpt_4_32k_0314, #gpt_4_32k_0613, #gpt_3_5_turbo, #gpt_3_5_turbo_16k, #gpt_3_5_turbo_0301, #gpt_3_5_turbo_0613, #gpt_3_5_turbo_1106, #gpt_3_5_turbo_0125, #gpt_3_5_turbo_16k_0613

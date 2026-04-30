@@ -5,22 +5,44 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // JSONSchema.mo
 
 module {
-    public type JSONSchema = {
-        /// A description of what the response format is for, used by the model to determine how to respond in the format. 
-        description : ?Text;
+    /// The required-fields slice of JSONSchema — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64. 
         name : Text;
-        /// The schema for the response format, described as a JSON Schema object. Learn how to build JSON schemas [here](https://json-schema.org/). 
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express JSONSchema as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        description : ?Text;
         schema : ?Map<Text, Text>;
-        /// Whether to enable strict schema adherence when generating the output. If set to true, the model will always follow the exact schema defined in the `schema` field. Only a subset of JSON Schema is supported when `strict` is `true`. To learn more, read the [Structured Outputs guide](/docs/guides/structured-outputs). 
         strict : ?Bool;
     };
 
+    public type JSONSchema = Required and Optional;
+
     public module JSON {
+        // `init` constructs a JSONSchema from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { JSONSchema.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : JSONSchema {
+            let ?res = from_candid(to_candid(required)) : ?JSONSchema else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : JSONSchema) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             switch (value.description) {

@@ -3,6 +3,7 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateImageRequestSize.mo
 /// Enum values: #auto, #_1024x1024, #_1536x1024, #_1024x1536, #_256x256, #_512x512, #_1792x1024, #_1024x1792

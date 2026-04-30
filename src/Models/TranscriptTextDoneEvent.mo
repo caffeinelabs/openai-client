@@ -7,19 +7,43 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // TranscriptTextDoneEvent.mo
 
 module {
-    public type TranscriptTextDoneEvent = {
+    /// The required-fields slice of TranscriptTextDoneEvent — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         type_ : TranscriptTextDoneEventType;
         /// The text that was transcribed. 
         text_ : Text;
-        /// The log probabilities of the individual tokens in the transcription. Only included if you [create a transcription](/docs/api-reference/audio/create-transcription) with the `include[]` parameter set to `logprobs`. 
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express TranscriptTextDoneEvent as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         logprobs : ?[TranscriptTextDeltaEventLogprobsInner];
     };
 
+    public type TranscriptTextDoneEvent = Required and Optional;
+
     public module JSON {
+        // `init` constructs a TranscriptTextDoneEvent from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { TranscriptTextDoneEvent.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : TranscriptTextDoneEvent {
+            let ?res = from_candid(to_candid(required)) : ?TranscriptTextDoneEvent else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : TranscriptTextDoneEvent) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("type", TranscriptTextDoneEventType.toCandidValue(value.type_)));

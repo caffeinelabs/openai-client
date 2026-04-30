@@ -9,11 +9,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateCompletionResponse.mo
 
 module {
-    public type CreateCompletionResponse = {
+    /// The required-fields slice of CreateCompletionResponse — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// A unique identifier for the completion.
         id : Text;
         /// The list of completion choices the model generated for the input prompt.
@@ -22,13 +26,33 @@ module {
         created : Int;
         /// The model used for completion.
         model : Text;
-        /// This fingerprint represents the backend configuration that the model runs with.  Can be used in conjunction with the `seed` request parameter to understand when backend changes have been made that might impact determinism. 
-        system_fingerprint : ?Text;
         object_ : CreateCompletionResponseObject;
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateCompletionResponse as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+        system_fingerprint : ?Text;
         usage : ?CompletionUsage;
     };
 
+    public type CreateCompletionResponse = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateCompletionResponse from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateCompletionResponse.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateCompletionResponse {
+            let ?res = from_candid(to_candid(required)) : ?CreateCompletionResponse else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateCompletionResponse) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("id", #Text(value.id)));

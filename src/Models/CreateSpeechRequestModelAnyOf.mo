@@ -2,6 +2,7 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateSpeechRequestModelAnyOf.mo
 /// Enum values: #tts_1, #tts_1_hd, #gpt_4o_mini_tts

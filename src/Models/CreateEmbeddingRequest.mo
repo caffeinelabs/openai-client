@@ -8,22 +8,45 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 import Int "mo:core/Int";
 
 // CreateEmbeddingRequest.mo
 
 module {
-    public type CreateEmbeddingRequest = {
+    /// The required-fields slice of CreateEmbeddingRequest — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         input : CreateEmbeddingRequestInput;
         model : CreateEmbeddingRequestModel;
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateEmbeddingRequest as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         encoding_format : ?CreateEmbeddingRequestEncodingFormat;
-        /// The number of dimensions the resulting output embeddings should have. Only supported in `text-embedding-3` and later models. 
         dimensions : ?Nat;
-        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. [Learn more](/docs/guides/safety-best-practices#end-user-ids). 
         user : ?Text;
     };
 
+    public type CreateEmbeddingRequest = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateEmbeddingRequest from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateEmbeddingRequest.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateEmbeddingRequest {
+            let ?res = from_candid(to_candid(required)) : ?CreateEmbeddingRequest else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateEmbeddingRequest) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("input", CreateEmbeddingRequestInput.toCandidValue(value.input)));

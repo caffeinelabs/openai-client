@@ -5,11 +5,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // ImagesResponseUsage.mo
 
 module {
-    public type ImagesResponseUsage = {
+    /// The required-fields slice of ImagesResponseUsage — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// The total number of tokens (images and text) used for the image generation.
         total_tokens : Int;
         /// The number of tokens (images and text) in the input prompt.
@@ -19,7 +23,28 @@ module {
         input_tokens_details : ImagesResponseUsageInputTokensDetails;
     };
 
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express ImagesResponseUsage as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+    };
+
+    public type ImagesResponseUsage = Required and Optional;
+
     public module JSON {
+        // `init` constructs a ImagesResponseUsage from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { ImagesResponseUsage.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : ImagesResponseUsage {
+            let ?res = from_candid(to_candid(required)) : ?ImagesResponseUsage else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : ImagesResponseUsage) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("total_tokens", #Int(value.total_tokens)));

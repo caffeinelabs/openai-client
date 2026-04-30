@@ -2,11 +2,15 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // TranscriptionSegment.mo
 
 module {
-    public type TranscriptionSegment = {
+    /// The required-fields slice of TranscriptionSegment — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// Unique identifier of the segment.
         id : Int;
         /// Seek offset of the segment.
@@ -29,7 +33,28 @@ module {
         no_speech_prob : Float;
     };
 
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express TranscriptionSegment as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
+    };
+
+    public type TranscriptionSegment = Required and Optional;
+
     public module JSON {
+        // `init` constructs a TranscriptionSegment from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { TranscriptionSegment.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : TranscriptionSegment {
+            let ?res = from_candid(to_candid(required)) : ?TranscriptionSegment else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : TranscriptionSegment) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("id", #Int(value.id)));

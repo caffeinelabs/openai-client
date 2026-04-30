@@ -18,31 +18,53 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 import Int "mo:core/Int";
 
 // CreateImageRequest.mo
 
 module {
-    public type CreateImageRequest = {
+    /// The required-fields slice of CreateImageRequest — what `init` consumes.
+    /// Exposed so callers can write `let req : Required = {...}` if they want
+    /// to manipulate the required-only payload independently of the full record.
+    public type Required = {
         /// A text description of the desired image(s). The maximum length is 32000 characters for `gpt-image-1`, 1000 characters for `dall-e-2` and 4000 characters for `dall-e-3`.
         prompt : Text;
+    };
+
+    // Optional-fields slice. Private — not part of the consumer surface;
+    // it's an internal scaffold so we can express CreateImageRequest as an
+    // `and`-intersection and keep `init` from listing every optional explicitly.
+    type Optional = {
         model : ?CreateImageRequestModel;
-        /// The number of images to generate. Must be between 1 and 10. For `dall-e-3`, only `n=1` is supported.
         n : ?Nat;
         quality : ?CreateImageRequestQuality;
         response_format : ?CreateImageRequestResponseFormat;
         output_format : ?CreateImageRequestOutputFormat;
-        /// The compression level (0-100%) for the generated images. This parameter is only supported for `gpt-image-1` with the `webp` or `jpeg` output formats, and defaults to 100.
         output_compression : ?Int;
         size : ?CreateImageRequestSize;
         moderation : ?CreateImageRequestModeration;
         background : ?CreateImageRequestBackground;
         style : ?CreateImageRequestStyle;
-        /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. [Learn more](/docs/guides/safety-best-practices#end-user-ids). 
         user : ?Text;
     };
 
+    public type CreateImageRequest = Required and Optional;
+
     public module JSON {
+        // `init` constructs a CreateImageRequest from just its required fields,
+        // defaulting all optional fields to `null`. Pair with record-update
+        // syntax to layer in selected optionals:
+        //   let req = { CreateImageRequest.init { …required fields… } with someOpt = ?… };
+        // Implementation uses Candid round-trip — Candid record subtyping fills
+        // absent optional fields with null. Costs a few cycles per call (init is
+        // not on a hot path) but keeps generated code compact regardless of how
+        // many optional fields the model has.
+        public func init(required : Required) : CreateImageRequest {
+            let ?res = from_candid(to_candid(required)) : ?CreateImageRequest else Runtime.unreachable();
+            res
+        };
+
         public func toCandidValue(value : CreateImageRequest) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("prompt", #Text(value.prompt)));

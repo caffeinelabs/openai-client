@@ -4,6 +4,41 @@ All notable changes to this package are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.3) — 2026-04-30
+
+### Added
+
+- **`init(required : { … }) : T`** — every record-shape model exports an `init`
+  function in its `JSON` sub-module that takes only the required fields and
+  defaults all optional fields to `null`. Pair with the record-update syntax
+  to set selected optionals:
+
+  ```motoko
+  // before — 30 fields, ~28 nulls:
+  let req : CreateChatCompletionRequest = {
+    model = "gpt-4o-mini";
+    messages = [...];
+    max_tokens = ?512;
+    metadata = null; temperature = null; top_p = null; /* ...25 more nulls... */
+  };
+
+  // after:
+  let req = { CreateChatCompletionRequest.init { model = "gpt-4o-mini"; messages = [...] }
+              with max_tokens = ?512 };
+  ```
+
+  Each model's user-facing type is also restructured as
+  `public type T = Required and Optional` (record-type intersection), with
+  `Required` exposed as a public sub-type and `Optional` private — purely a
+  scaffold for `init`'s parameter type. The wire shape and all existing APIs
+  (`toCandidValue` / `fromCandidValue` / `toText`) are unchanged.
+
+  Implementation: `init` uses Candid round-trip
+  (`from_candid(to_candid(required))`); Candid record subtyping fills the
+  absent optional fields with null. Costs a few cycles per call (init isn't a
+  hot path) and keeps the generated code compact regardless of how many
+  optional fields the model has.
+
 ## [0.2.2](https://github.com/caffeinelabs/openai-client/releases/tag/v0.2.2) — 2026-04-28
 
 ### Fixed

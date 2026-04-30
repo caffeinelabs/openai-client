@@ -2,6 +2,7 @@ import { Candid } "mo:serde-core";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Float "mo:core/Float";
+import Runtime "mo:core/Runtime";
 
 // CreateModerationRequestModelAnyOf.mo
 /// Enum values: #omni_moderation_latest, #omni_moderation_2024_09_26, #text_moderation_latest, #text_moderation_stable
