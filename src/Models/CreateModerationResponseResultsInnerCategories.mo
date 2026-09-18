@@ -86,36 +86,36 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponseResultsInnerCategories =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?hate_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate") else return null;
+                case (#Record(record__)) {
+                    let ?hate_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate") else return null;
                     let ?hate = ((switch (hate_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?hate_threatening_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate/threatening") else return null;
+                    let ?hate_threatening_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "hate/threatening") else return null;
                     let ?hate_threatening = ((switch (hate_threatening_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?harassment_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment") else return null;
+                    let ?harassment_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment") else return null;
                     let ?harassment = ((switch (harassment_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?harassment_threatening_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment/threatening") else return null;
+                    let ?harassment_threatening_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "harassment/threatening") else return null;
                     let ?harassment_threatening = ((switch (harassment_threatening_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let illicit : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit")) {
+                    let illicit : ?Bool = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit")) {
                         case (?illicit_field) ((switch (illicit_field.1) { case (#Bool(b)) ?b; case _ null }));
                         case null null;
                     };
-                    let illicit_violent : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit/violent")) {
+                    let illicit_violent : ?Bool = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "illicit/violent")) {
                         case (?illicit_violent_field) ((switch (illicit_violent_field.1) { case (#Bool(b)) ?b; case _ null }));
                         case null null;
                     };
-                    let ?self_harm_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm") else return null;
+                    let ?self_harm_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm") else return null;
                     let ?self_harm = ((switch (self_harm_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?self_harm_intent_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/intent") else return null;
+                    let ?self_harm_intent_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/intent") else return null;
                     let ?self_harm_intent = ((switch (self_harm_intent_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?self_harm_instructions_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/instructions") else return null;
+                    let ?self_harm_instructions_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "self-harm/instructions") else return null;
                     let ?self_harm_instructions = ((switch (self_harm_instructions_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?sexual_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual") else return null;
+                    let ?sexual_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual") else return null;
                     let ?sexual = ((switch (sexual_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?sexual_minors_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual/minors") else return null;
+                    let ?sexual_minors_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "sexual/minors") else return null;
                     let ?sexual_minors = ((switch (sexual_minors_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?violence_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence") else return null;
+                    let ?violence_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence") else return null;
                     let ?violence = ((switch (violence_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?violence_graphic_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence/graphic") else return null;
+                    let ?violence_graphic_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "violence/graphic") else return null;
                     let ?violence_graphic = ((switch (violence_graphic_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
                     ?{
                         hate;

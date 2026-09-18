@@ -54,10 +54,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ListFilesResponse =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                case (#Record(record__)) {
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = ((switch (object__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?data_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
+                    let ?data_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
                     let ?data = ((switch (data_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<OpenAIFile>();
@@ -69,11 +69,11 @@ module {
                         };
                         case _ null;
                     })) else return null;
-                    let ?first_id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "first_id") else return null;
+                    let ?first_id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "first_id") else return null;
                     let ?first_id = ((switch (first_id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?last_id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "last_id") else return null;
+                    let ?last_id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "last_id") else return null;
                     let ?last_id = ((switch (last_id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?has_more_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "has_more") else return null;
+                    let ?has_more_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "has_more") else return null;
                     let ?has_more = ((switch (has_more_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
                     ?{
                         object_;

@@ -55,8 +55,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionResponseChoicesInnerLogprobs =
             switch (candid) {
-                case (#Record(fields)) {
-                    let content : ?[ChatCompletionTokenLogprob] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                case (#Record(record__)) {
+                    let content : ?[ChatCompletionTokenLogprob] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
                         case (?content_field) ((switch (content_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionTokenLogprob>();
@@ -70,7 +70,7 @@ module {
                     }));
                         case null null;
                     };
-                    let refusal : ?[ChatCompletionTokenLogprob] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
+                    let refusal : ?[ChatCompletionTokenLogprob] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
                         case (?refusal_field) ((switch (refusal_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionTokenLogprob>();

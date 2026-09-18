@@ -53,12 +53,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionMessageToolCall =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                case (#Record(record__)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
                     let ?type_ = (ChatCompletionMessageToolCallType.fromCandidValue(type__field.1)) else return null;
-                    let ?function_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function") else return null;
+                    let ?function_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function") else return null;
                     let ?function = (ChatCompletionMessageToolCallFunction.fromCandidValue(function_field.1)) else return null;
                     ?{
                         id;

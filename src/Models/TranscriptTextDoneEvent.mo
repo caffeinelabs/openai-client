@@ -57,12 +57,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?TranscriptTextDoneEvent =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                case (#Record(record__)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
                     let ?type_ = (TranscriptTextDoneEventType.fromCandidValue(type__field.1)) else return null;
-                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let logprobs : ?[TranscriptTextDeltaEventLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let logprobs : ?[TranscriptTextDeltaEventLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) ((switch (logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<TranscriptTextDeltaEventLogprobsInner>();

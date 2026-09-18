@@ -51,12 +51,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?TranscriptionWord =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?word_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "word") else return null;
+                case (#Record(record__)) {
+                    let ?word_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "word") else return null;
                     let ?word = ((switch (word_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?start_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start") else return null;
+                    let ?start_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start") else return null;
                     let ?start = ((switch (start_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
-                    let ?end_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end") else return null;
+                    let ?end_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end") else return null;
                     let ?end = ((switch (end_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
                     ?{
                         word;

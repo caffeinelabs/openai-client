@@ -87,16 +87,16 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionMessageListDataInner =
             switch (candid) {
-                case (#Record(fields)) {
-                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                case (#Record(record__)) {
+                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
                         case (?content_field) ((switch (content_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
+                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
                         case (?refusal_field) ((switch (refusal_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let tool_calls : ?[ChatCompletionMessageToolCall] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
+                    let tool_calls : ?[ChatCompletionMessageToolCall] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
                         case (?tool_calls_field) ((switch (tool_calls_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionMessageToolCall>();
@@ -110,7 +110,7 @@ module {
                     }));
                         case null null;
                     };
-                    let annotations : ?[ChatCompletionResponseMessageAnnotationsInner] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "annotations")) {
+                    let annotations : ?[ChatCompletionResponseMessageAnnotationsInner] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "annotations")) {
                         case (?annotations_field) ((switch (annotations_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionResponseMessageAnnotationsInner>();
@@ -124,17 +124,17 @@ module {
                     }));
                         case null null;
                     };
-                    let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                    let ?role_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
                     let ?role = (ChatCompletionResponseMessageRole.fromCandidValue(role_field.1)) else return null;
-                    let function_call : ?ChatCompletionResponseMessageFunctionCall = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
+                    let function_call : ?ChatCompletionResponseMessageFunctionCall = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
                         case (?function_call_field) (ChatCompletionResponseMessageFunctionCall.fromCandidValue(function_call_field.1));
                         case null null;
                     };
-                    let audio : ?ChatCompletionResponseMessageAudio = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio")) {
+                    let audio : ?ChatCompletionResponseMessageAudio = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio")) {
                         case (?audio_field) (ChatCompletionResponseMessageAudio.fromCandidValue(audio_field.1));
                         case null null;
                     };
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         content;

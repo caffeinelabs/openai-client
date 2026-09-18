@@ -68,20 +68,20 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateEmbeddingRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?input_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
+                case (#Record(record__)) {
+                    let ?input_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
                     let ?input = (CreateEmbeddingRequestInput.fromCandidValue(input_field.1)) else return null;
-                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = (CreateEmbeddingRequestModel.fromCandidValue(model_field.1)) else return null;
-                    let encoding_format : ?CreateEmbeddingRequestEncodingFormat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "encoding_format")) {
+                    let encoding_format : ?CreateEmbeddingRequestEncodingFormat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "encoding_format")) {
                         case (?encoding_format_field) (CreateEmbeddingRequestEncodingFormat.fromCandidValue(encoding_format_field.1));
                         case null null;
                     };
-                    let dimensions : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "dimensions")) {
+                    let dimensions : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "dimensions")) {
                         case (?dimensions_field) ((switch (dimensions_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
+                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
                         case (?user_field) ((switch (user_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

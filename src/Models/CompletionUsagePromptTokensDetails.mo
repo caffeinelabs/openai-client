@@ -53,12 +53,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CompletionUsagePromptTokensDetails =
             switch (candid) {
-                case (#Record(fields)) {
-                    let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
+                case (#Record(record__)) {
+                    let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
                         case (?audio_tokens_field) ((switch (audio_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let cached_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "cached_tokens")) {
+                    let cached_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "cached_tokens")) {
                         case (?cached_tokens_field) ((switch (cached_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };

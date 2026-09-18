@@ -60,14 +60,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionResponseChoicesInner =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?finish_reason_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason") else return null;
+                case (#Record(record__)) {
+                    let ?finish_reason_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason") else return null;
                     let ?finish_reason = (CreateChatCompletionResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1)) else return null;
-                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
                     let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?message_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "message") else return null;
+                    let ?message_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "message") else return null;
                     let ?message = (ChatCompletionResponseMessage.fromCandidValue(message_field.1)) else return null;
-                    let logprobs : ?CreateChatCompletionResponseChoicesInnerLogprobs = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let logprobs : ?CreateChatCompletionResponseChoicesInnerLogprobs = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) (CreateChatCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1));
                         case null null;
                     };

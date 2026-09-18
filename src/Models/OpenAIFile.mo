@@ -77,26 +77,26 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?OpenAIFile =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                case (#Record(record__)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?bytes_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes") else return null;
+                    let ?bytes_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes") else return null;
                     let ?bytes = ((switch (bytes_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?created_at_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created_at") else return null;
+                    let ?created_at_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created_at") else return null;
                     let ?created_at = ((switch (created_at_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let expires_at : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "expires_at")) {
+                    let expires_at : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "expires_at")) {
                         case (?expires_at_field) ((switch (expires_at_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let ?filename_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "filename") else return null;
+                    let ?filename_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "filename") else return null;
                     let ?filename = ((switch (filename_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (OpenAIFileObject.fromCandidValue(object__field.1)) else return null;
-                    let ?purpose_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "purpose") else return null;
+                    let ?purpose_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "purpose") else return null;
                     let ?purpose = (OpenAIFilePurpose.fromCandidValue(purpose_field.1)) else return null;
-                    let ?status_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "status") else return null;
+                    let ?status_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "status") else return null;
                     let ?status = (OpenAIFileStatus.fromCandidValue(status_field.1)) else return null;
-                    let status_details : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "status_details")) {
+                    let status_details : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "status_details")) {
                         case (?status_details_field) ((switch (status_details_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

@@ -57,16 +57,16 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?TranscriptTextDeltaEventLogprobsInner =
             switch (candid) {
-                case (#Record(fields)) {
-                    let token : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token")) {
+                case (#Record(record__)) {
+                    let token : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token")) {
                         case (?token_field) ((switch (token_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let logprob : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprob")) {
+                    let logprob : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprob")) {
                         case (?logprob_field) ((switch (logprob_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
-                    let bytes : ?[Text] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes")) {
+                    let bytes : ?[Text] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes")) {
                         case (?bytes_field) ((switch (bytes_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Text>();

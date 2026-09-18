@@ -57,14 +57,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationResponseResultsInner =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?flagged_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "flagged") else return null;
+                case (#Record(record__)) {
+                    let ?flagged_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "flagged") else return null;
                     let ?flagged = ((switch (flagged_field.1) { case (#Bool(b)) ?b; case _ null })) else return null;
-                    let ?categories_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "categories") else return null;
+                    let ?categories_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "categories") else return null;
                     let ?categories = (CreateModerationResponseResultsInnerCategories.fromCandidValue(categories_field.1)) else return null;
-                    let ?category_scores_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "category_scores") else return null;
+                    let ?category_scores_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "category_scores") else return null;
                     let ?category_scores = (CreateModerationResponseResultsInnerCategoryScores.fromCandidValue(category_scores_field.1)) else return null;
-                    let ?category_applied_input_types_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "category_applied_input_types") else return null;
+                    let ?category_applied_input_types_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "category_applied_input_types") else return null;
                     let ?category_applied_input_types = (CreateModerationResponseResultsInnerCategoryAppliedInputTypes.fromCandidValue(category_applied_input_types_field.1)) else return null;
                     ?{
                         flagged;

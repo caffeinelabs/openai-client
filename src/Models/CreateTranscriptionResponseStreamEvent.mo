@@ -20,17 +20,15 @@ module {
     /// to manipulate the required-only payload independently of the full record.
     public type Required = {
         type_ : TranscriptTextDoneEventType;
-        /// The text delta that was additionally transcribed. 
-        delta : Text;
-        /// The text that was transcribed. 
-        text_ : Text;
     };
 
     // Optional-fields slice. Private — not part of the consumer surface;
     // it's an internal scaffold so we can express CreateTranscriptionResponseStreamEvent as an
     // `and`-intersection and keep `init` from listing every optional explicitly.
     type Optional = {
+        delta : ?Text;
         logprobs : ?[TranscriptTextDeltaEventLogprobsInner];
+        text_ : ?Text;
     };
 
     public type CreateTranscriptionResponseStreamEvent = Required and Optional;
@@ -52,23 +50,31 @@ module {
         public func toCandidValue(value : CreateTranscriptionResponseStreamEvent) : Candid.Candid {
             let buf = List.empty<(Text, Candid.Candid)>();
             List.add(buf, ("type", TranscriptTextDoneEventType.toCandidValue(value.type_)));
-            List.add(buf, ("delta", #Text(value.delta)));
+            switch (value.delta) {
+                case (?v__) List.add(buf, ("delta", #Text(v__)));
+                case null ();
+            };
             switch (value.logprobs) {
                 case (?v__) List.add(buf, ("logprobs", #Array(Array.map<TranscriptTextDeltaEventLogprobsInner, Candid.Candid>(v__, TranscriptTextDeltaEventLogprobsInner.toCandidValue))));
                 case null ();
             };
-            List.add(buf, ("text", #Text(value.text_)));
+            switch (value.text_) {
+                case (?v__) List.add(buf, ("text", #Text(v__)));
+                case null ();
+            };
             #Record(List.toArray(buf));
         };
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionResponseStreamEvent =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                case (#Record(record__)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
                     let ?type_ = (TranscriptTextDoneEventType.fromCandidValue(type__field.1)) else return null;
-                    let ?delta_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "delta") else return null;
-                    let ?delta = ((switch (delta_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let logprobs : ?[TranscriptTextDeltaEventLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let delta : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "delta")) {
+                        case (?delta_field) ((switch (delta_field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
+                    let logprobs : ?[TranscriptTextDeltaEventLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) ((switch (logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<TranscriptTextDeltaEventLogprobsInner>();
@@ -82,8 +88,10 @@ module {
                     }));
                         case null null;
                     };
-                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
-                    let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
+                    let text_ : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text")) {
+                        case (?text__field) ((switch (text__field.1) { case (#Text(s)) ?s; case _ null }));
+                        case null null;
+                    };
                     ?{
                         type_;
                         delta;

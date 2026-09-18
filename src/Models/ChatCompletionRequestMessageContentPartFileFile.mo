@@ -57,16 +57,16 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessageContentPartFileFile =
             switch (candid) {
-                case (#Record(fields)) {
-                    let filename : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "filename")) {
+                case (#Record(record__)) {
+                    let filename : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "filename")) {
                         case (?filename_field) ((switch (filename_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let file_data : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "file_data")) {
+                    let file_data : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "file_data")) {
                         case (?file_data_field) ((switch (file_data_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let file_id : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "file_id")) {
+                    let file_id : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "file_id")) {
                         case (?file_id_field) ((switch (file_id_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
