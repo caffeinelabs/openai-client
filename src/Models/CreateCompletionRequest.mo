@@ -140,26 +140,26 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateCompletionRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                case (#Record(record__)) {
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = (CreateCompletionRequestModel.fromCandidValue(model_field.1)) else return null;
-                    let prompt : ?CreateCompletionRequestPrompt = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt")) {
+                    let prompt : ?CreateCompletionRequestPrompt = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt")) {
                         case (?prompt_field) (CreateCompletionRequestPrompt.fromCandidValue(prompt_field.1));
                         case null null;
                     };
-                    let best_of : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "best_of")) {
+                    let best_of : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "best_of")) {
                         case (?best_of_field) ((switch (best_of_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let echo : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "echo")) {
+                    let echo : ?Bool = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "echo")) {
                         case (?echo_field) ((switch (echo_field.1) { case (#Bool(b)) ?b; case _ null }));
                         case null null;
                     };
-                    let frequency_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "frequency_penalty")) {
+                    let frequency_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "frequency_penalty")) {
                         case (?frequency_penalty_field) ((switch (frequency_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
-                    let logit_bias : ?Map<Text, Int> = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logit_bias")) {
+                    let logit_bias : ?Map<Text, Int> = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logit_bias")) {
                         case (?logit_bias_field) ((switch (logit_bias_field.1) {
                         case (#Record(pairs__)) {
                             let buf__ = List.empty<(Text, Int)>();
@@ -173,51 +173,51 @@ module {
                     }));
                         case null null;
                     };
-                    let logprobs : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let logprobs : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) ((switch (logprobs_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let max_tokens : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "max_tokens")) {
+                    let max_tokens : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "max_tokens")) {
                         case (?max_tokens_field) ((switch (max_tokens_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let n : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "n")) {
+                    let n : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "n")) {
                         case (?n_field) ((switch (n_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let presence_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "presence_penalty")) {
+                    let presence_penalty : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "presence_penalty")) {
                         case (?presence_penalty_field) ((switch (presence_penalty_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
-                    let seed : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seed")) {
+                    let seed : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "seed")) {
                         case (?seed_field) ((switch (seed_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let stop : ?StopConfiguration = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stop")) {
+                    let stop : ?StopConfiguration = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stop")) {
                         case (?stop_field) (StopConfiguration.fromCandidValue(stop_field.1));
                         case null null;
                     };
-                    let stream : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stream")) {
+                    let stream : ?Bool = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stream")) {
                         case (?stream_field) ((switch (stream_field.1) { case (#Bool(b)) ?b; case _ null }));
                         case null null;
                     };
-                    let stream_options : ?ChatCompletionStreamOptions = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stream_options")) {
+                    let stream_options : ?ChatCompletionStreamOptions = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "stream_options")) {
                         case (?stream_options_field) (ChatCompletionStreamOptions.fromCandidValue(stream_options_field.1));
                         case null null;
                     };
-                    let suffix : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "suffix")) {
+                    let suffix : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "suffix")) {
                         case (?suffix_field) ((switch (suffix_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let temperature : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature")) {
+                    let temperature : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "temperature")) {
                         case (?temperature_field) ((switch (temperature_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
-                    let top_p : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_p")) {
+                    let top_p : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_p")) {
                         case (?top_p_field) ((switch (top_p_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };
-                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
+                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
                         case (?user_field) ((switch (user_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

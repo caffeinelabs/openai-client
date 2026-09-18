@@ -53,10 +53,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateModerationRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?input_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
+                case (#Record(record__)) {
+                    let ?input_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
                     let ?input = (CreateModerationRequestInput.fromCandidValue(input_field.1)) else return null;
-                    let model : ?CreateModerationRequestModel = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model")) {
+                    let model : ?CreateModerationRequestModel = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model")) {
                         case (?model_field) (CreateModerationRequestModel.fromCandidValue(model_field.1));
                         case null null;
                     };

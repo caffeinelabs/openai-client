@@ -43,7 +43,7 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateImageEditRequestImage =
             switch (candid) {
-                case (#Record(fields)) {
+                case (#Record(record__)) {
                     ?{
                     };
                 };

@@ -50,10 +50,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ListModelsResponse =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                case (#Record(record__)) {
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (ListAuditLogsResponseObject.fromCandidValue(object__field.1)) else return null;
-                    let ?data_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
+                    let ?data_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
                     let ?data = ((switch (data_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Model>();

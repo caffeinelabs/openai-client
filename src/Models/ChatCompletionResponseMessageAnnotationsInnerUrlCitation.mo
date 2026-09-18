@@ -55,14 +55,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionResponseMessageAnnotationsInnerUrlCitation =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?end_index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end_index") else return null;
+                case (#Record(record__)) {
+                    let ?end_index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "end_index") else return null;
                     let ?end_index = ((switch (end_index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?start_index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start_index") else return null;
+                    let ?start_index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "start_index") else return null;
                     let ?start_index = ((switch (start_index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?url_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "url") else return null;
+                    let ?url_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "url") else return null;
                     let ?url = ((switch (url_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?title_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "title") else return null;
+                    let ?title_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "title") else return null;
                     let ?title = ((switch (title_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         end_index;

@@ -117,50 +117,50 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateImageRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?prompt_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt") else return null;
+                case (#Record(record__)) {
+                    let ?prompt_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt") else return null;
                     let ?prompt = ((switch (prompt_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let model : ?CreateImageRequestModel = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model")) {
+                    let model : ?CreateImageRequestModel = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model")) {
                         case (?model_field) (CreateImageRequestModel.fromCandidValue(model_field.1));
                         case null null;
                     };
-                    let n : ?Nat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "n")) {
+                    let n : ?Nat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "n")) {
                         case (?n_field) ((switch (n_field.1) { case (#Nat(n)) ?n; case (#Int(i)) (if (i < 0) null else ?Int.abs(i)); case _ null }));
                         case null null;
                     };
-                    let quality : ?CreateImageRequestQuality = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "quality")) {
+                    let quality : ?CreateImageRequestQuality = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "quality")) {
                         case (?quality_field) (CreateImageRequestQuality.fromCandidValue(quality_field.1));
                         case null null;
                     };
-                    let response_format : ?CreateImageRequestResponseFormat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "response_format")) {
+                    let response_format : ?CreateImageRequestResponseFormat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "response_format")) {
                         case (?response_format_field) (CreateImageRequestResponseFormat.fromCandidValue(response_format_field.1));
                         case null null;
                     };
-                    let output_format : ?CreateImageRequestOutputFormat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_format")) {
+                    let output_format : ?CreateImageRequestOutputFormat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_format")) {
                         case (?output_format_field) (CreateImageRequestOutputFormat.fromCandidValue(output_format_field.1));
                         case null null;
                     };
-                    let output_compression : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_compression")) {
+                    let output_compression : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_compression")) {
                         case (?output_compression_field) ((switch (output_compression_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let size : ?CreateImageRequestSize = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "size")) {
+                    let size : ?CreateImageRequestSize = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "size")) {
                         case (?size_field) (CreateImageRequestSize.fromCandidValue(size_field.1));
                         case null null;
                     };
-                    let moderation : ?CreateImageRequestModeration = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "moderation")) {
+                    let moderation : ?CreateImageRequestModeration = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "moderation")) {
                         case (?moderation_field) (CreateImageRequestModeration.fromCandidValue(moderation_field.1));
                         case null null;
                     };
-                    let background : ?CreateImageRequestBackground = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "background")) {
+                    let background : ?CreateImageRequestBackground = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "background")) {
                         case (?background_field) (CreateImageRequestBackground.fromCandidValue(background_field.1));
                         case null null;
                     };
-                    let style : ?CreateImageRequestStyle = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "style")) {
+                    let style : ?CreateImageRequestStyle = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "style")) {
                         case (?style_field) (CreateImageRequestStyle.fromCandidValue(style_field.1));
                         case null null;
                     };
-                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
+                    let user : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user")) {
                         case (?user_field) ((switch (user_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

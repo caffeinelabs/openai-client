@@ -63,20 +63,20 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CompletionUsageCompletionTokensDetails =
             switch (candid) {
-                case (#Record(fields)) {
-                    let accepted_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "accepted_prediction_tokens")) {
+                case (#Record(record__)) {
+                    let accepted_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "accepted_prediction_tokens")) {
                         case (?accepted_prediction_tokens_field) ((switch (accepted_prediction_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
+                    let audio_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "audio_tokens")) {
                         case (?audio_tokens_field) ((switch (audio_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let reasoning_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "reasoning_tokens")) {
+                    let reasoning_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "reasoning_tokens")) {
                         case (?reasoning_tokens_field) ((switch (reasoning_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };
-                    let rejected_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "rejected_prediction_tokens")) {
+                    let rejected_prediction_tokens : ?Int = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "rejected_prediction_tokens")) {
                         case (?rejected_prediction_tokens_field) ((switch (rejected_prediction_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null }));
                         case null null;
                     };

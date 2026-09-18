@@ -53,10 +53,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionResponseJson =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                case (#Record(record__)) {
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let logprobs : ?[CreateTranscriptionResponseJsonLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let logprobs : ?[CreateTranscriptionResponseJsonLogprobsInner] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) ((switch (logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<CreateTranscriptionResponseJsonLogprobsInner>();

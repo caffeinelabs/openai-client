@@ -70,22 +70,22 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateSpeechRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                case (#Record(record__)) {
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = (CreateSpeechRequestModel.fromCandidValue(model_field.1)) else return null;
-                    let ?input_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
+                    let ?input_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input") else return null;
                     let ?input = ((switch (input_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let instructions : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "instructions")) {
+                    let instructions : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "instructions")) {
                         case (?instructions_field) ((switch (instructions_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let ?voice_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "voice") else return null;
+                    let ?voice_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "voice") else return null;
                     let ?voice = (VoiceIdsShared.fromCandidValue(voice_field.1)) else return null;
-                    let response_format : ?CreateSpeechRequestResponseFormat = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "response_format")) {
+                    let response_format : ?CreateSpeechRequestResponseFormat = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "response_format")) {
                         case (?response_format_field) (CreateSpeechRequestResponseFormat.fromCandidValue(response_format_field.1));
                         case null null;
                     };
-                    let speed : ?Float = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "speed")) {
+                    let speed : ?Float = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "speed")) {
                         case (?speed_field) ((switch (speed_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null }));
                         case null null;
                     };

@@ -57,14 +57,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionFunctions =
             switch (candid) {
-                case (#Record(fields)) {
-                    let description : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "description")) {
+                case (#Record(record__)) {
+                    let description : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "description")) {
                         case (?description_field) ((switch (description_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let ?name_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
+                    let ?name_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
                     let ?name = ((switch (name_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let parameters : ?Map<Text, Text> = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "parameters")) {
+                    let parameters : ?Map<Text, Text> = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "parameters")) {
                         case (?parameters_field) ((switch (parameters_field.1) {
                         case (#Record(pairs__)) {
                             let buf__ = List.empty<(Text, Text)>();

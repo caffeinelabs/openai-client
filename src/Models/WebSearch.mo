@@ -57,12 +57,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?WebSearch =
             switch (candid) {
-                case (#Record(fields)) {
-                    let user_location : ?WebSearchUserLocation = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user_location")) {
+                case (#Record(record__)) {
+                    let user_location : ?WebSearchUserLocation = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "user_location")) {
                         case (?user_location_field) (WebSearchUserLocation.fromCandidValue(user_location_field.1));
                         case null null;
                     };
-                    let search_context_size : ?WebSearchContextSize = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "search_context_size")) {
+                    let search_context_size : ?WebSearchContextSize = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "search_context_size")) {
                         case (?search_context_size_field) (WebSearchContextSize.fromCandidValue(search_context_size_field.1));
                         case null null;
                     };

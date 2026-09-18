@@ -56,14 +56,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ImagesResponseUsage =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
+                case (#Record(record__)) {
+                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
                     let ?total_tokens = ((switch (total_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?input_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens") else return null;
+                    let ?input_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens") else return null;
                     let ?input_tokens = ((switch (input_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?output_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_tokens") else return null;
+                    let ?output_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "output_tokens") else return null;
                     let ?output_tokens = ((switch (output_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?input_tokens_details_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens_details") else return null;
+                    let ?input_tokens_details_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "input_tokens_details") else return null;
                     let ?input_tokens_details = (ImagesResponseUsageInputTokensDetails.fromCandidValue(input_tokens_details_field.1)) else return null;
                     ?{
                         total_tokens;

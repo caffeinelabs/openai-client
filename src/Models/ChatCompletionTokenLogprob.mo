@@ -58,12 +58,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionTokenLogprob =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?token_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token") else return null;
+                case (#Record(record__)) {
+                    let ?token_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token") else return null;
                     let ?token = ((switch (token_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?logprob_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprob") else return null;
+                    let ?logprob_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprob") else return null;
                     let ?logprob = ((switch (logprob_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
-                    let bytes : ?[Int] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes")) {
+                    let bytes : ?[Int] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "bytes")) {
                         case (?bytes_field) ((switch (bytes_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Int>();
@@ -77,7 +77,7 @@ module {
                     }));
                         case null null;
                     };
-                    let ?top_logprobs_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_logprobs") else return null;
+                    let ?top_logprobs_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_logprobs") else return null;
                     let ?top_logprobs = ((switch (top_logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionTokenLogprobTopLogprobsInner>();

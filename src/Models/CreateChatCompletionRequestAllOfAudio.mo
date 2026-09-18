@@ -50,10 +50,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionRequestAllOfAudio =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?voice_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "voice") else return null;
+                case (#Record(record__)) {
+                    let ?voice_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "voice") else return null;
                     let ?voice = (VoiceIdsShared.fromCandidValue(voice_field.1)) else return null;
-                    let ?format_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "format") else return null;
+                    let ?format_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "format") else return null;
                     let ?format = ((switch (format_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         voice;
