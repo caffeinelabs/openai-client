@@ -49,8 +49,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?UpdateChatCompletionRequest =
             switch (candid) {
-                case (#Record(fields)) {
-                    let metadata : ?Map<Text, Text> = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "metadata")) {
+                case (#Record(record__)) {
+                    let metadata : ?Map<Text, Text> = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "metadata")) {
                         case (?metadata_field) ((switch (metadata_field.1) {
                         case (#Record(pairs__)) {
                             let buf__ = List.empty<(Text, Text)>();

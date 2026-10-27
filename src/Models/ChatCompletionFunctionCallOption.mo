@@ -46,8 +46,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionFunctionCallOption =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?name_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
+                case (#Record(record__)) {
+                    let ?name_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
                     let ?name = ((switch (name_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         name;

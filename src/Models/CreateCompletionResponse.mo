@@ -73,10 +73,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateCompletionResponse =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                case (#Record(record__)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?choices_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "choices") else return null;
+                    let ?choices_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "choices") else return null;
                     let ?choices = ((switch (choices_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<CreateCompletionResponseChoicesInner>();
@@ -88,17 +88,17 @@ module {
                         };
                         case _ null;
                     })) else return null;
-                    let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
+                    let ?created_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
                     let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = ((switch (model_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let system_fingerprint : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "system_fingerprint")) {
+                    let system_fingerprint : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "system_fingerprint")) {
                         case (?system_fingerprint_field) ((switch (system_fingerprint_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (CreateCompletionResponseObject.fromCandidValue(object__field.1)) else return null;
-                    let usage : ?CompletionUsage = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage")) {
+                    let usage : ?CompletionUsage = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage")) {
                         case (?usage_field) (CompletionUsage.fromCandidValue(usage_field.1));
                         case null null;
                     };

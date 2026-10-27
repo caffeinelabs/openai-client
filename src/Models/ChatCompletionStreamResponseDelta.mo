@@ -74,16 +74,16 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionStreamResponseDelta =
             switch (candid) {
-                case (#Record(fields)) {
-                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                case (#Record(record__)) {
+                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
                         case (?content_field) ((switch (content_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let function_call : ?ChatCompletionStreamResponseDeltaFunctionCall = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
+                    let function_call : ?ChatCompletionStreamResponseDeltaFunctionCall = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function_call")) {
                         case (?function_call_field) (ChatCompletionStreamResponseDeltaFunctionCall.fromCandidValue(function_call_field.1));
                         case null null;
                     };
-                    let tool_calls : ?[ChatCompletionMessageToolCallChunk] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
+                    let tool_calls : ?[ChatCompletionMessageToolCallChunk] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tool_calls")) {
                         case (?tool_calls_field) ((switch (tool_calls_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<ChatCompletionMessageToolCallChunk>();
@@ -97,11 +97,11 @@ module {
                     }));
                         case null null;
                     };
-                    let role : ?ChatCompletionStreamResponseDeltaRole = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role")) {
+                    let role : ?ChatCompletionStreamResponseDeltaRole = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role")) {
                         case (?role_field) (ChatCompletionStreamResponseDeltaRole.fromCandidValue(role_field.1));
                         case null null;
                     };
-                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
+                    let refusal : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "refusal")) {
                         case (?refusal_field) ((switch (refusal_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

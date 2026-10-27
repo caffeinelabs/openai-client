@@ -56,14 +56,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?Model =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                case (#Record(record__)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
+                    let ?created_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
                     let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (ModelObject.fromCandidValue(object__field.1)) else return null;
-                    let ?owned_by_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "owned_by") else return null;
+                    let ?owned_by_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "owned_by") else return null;
                     let ?owned_by = ((switch (owned_by_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         id;

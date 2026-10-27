@@ -48,8 +48,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionStreamOptions =
             switch (candid) {
-                case (#Record(fields)) {
-                    let include_usage : ?Bool = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "include_usage")) {
+                case (#Record(record__)) {
+                    let include_usage : ?Bool = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "include_usage")) {
                         case (?include_usage_field) ((switch (include_usage_field.1) { case (#Bool(b)) ?b; case _ null }));
                         case null null;
                     };

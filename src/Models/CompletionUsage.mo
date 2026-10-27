@@ -66,18 +66,18 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CompletionUsage =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?completion_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens") else return null;
+                case (#Record(record__)) {
+                    let ?completion_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens") else return null;
                     let ?completion_tokens = ((switch (completion_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?prompt_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens") else return null;
+                    let ?prompt_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens") else return null;
                     let ?prompt_tokens = ((switch (prompt_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
+                    let ?total_tokens_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "total_tokens") else return null;
                     let ?total_tokens = ((switch (total_tokens_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let completion_tokens_details : ?CompletionUsageCompletionTokensDetails = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens_details")) {
+                    let completion_tokens_details : ?CompletionUsageCompletionTokensDetails = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "completion_tokens_details")) {
                         case (?completion_tokens_details_field) (CompletionUsageCompletionTokensDetails.fromCandidValue(completion_tokens_details_field.1));
                         case null null;
                     };
-                    let prompt_tokens_details : ?CompletionUsagePromptTokensDetails = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens_details")) {
+                    let prompt_tokens_details : ?CompletionUsagePromptTokensDetails = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "prompt_tokens_details")) {
                         case (?prompt_tokens_details_field) (CompletionUsagePromptTokensDetails.fromCandidValue(prompt_tokens_details_field.1));
                         case null null;
                     };

@@ -63,18 +63,18 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateChatCompletionStreamResponseChoicesInner =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?delta_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "delta") else return null;
+                case (#Record(record__)) {
+                    let ?delta_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "delta") else return null;
                     let ?delta = (ChatCompletionStreamResponseDelta.fromCandidValue(delta_field.1)) else return null;
-                    let logprobs : ?CreateChatCompletionResponseChoicesInnerLogprobs = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
+                    let logprobs : ?CreateChatCompletionResponseChoicesInnerLogprobs = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "logprobs")) {
                         case (?logprobs_field) (CreateChatCompletionResponseChoicesInnerLogprobs.fromCandidValue(logprobs_field.1));
                         case null null;
                     };
-                    let finish_reason : ?CreateChatCompletionStreamResponseChoicesInnerFinishReason = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason")) {
+                    let finish_reason : ?CreateChatCompletionStreamResponseChoicesInnerFinishReason = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "finish_reason")) {
                         case (?finish_reason_field) (CreateChatCompletionStreamResponseChoicesInnerFinishReason.fromCandidValue(finish_reason_field.1));
                         case null null;
                     };
-                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
                     let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
                     ?{
                         delta;

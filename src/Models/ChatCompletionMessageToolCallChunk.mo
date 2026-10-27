@@ -63,18 +63,18 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionMessageToolCallChunk =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                case (#Record(record__)) {
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
                     let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let id : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id")) {
+                    let id : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id")) {
                         case (?id_field) ((switch (id_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let type_ : ?ChatCompletionMessageToolCallType = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type")) {
+                    let type_ : ?ChatCompletionMessageToolCallType = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type")) {
                         case (?type__field) (ChatCompletionMessageToolCallType.fromCandidValue(type__field.1));
                         case null null;
                     };
-                    let function : ?ChatCompletionMessageToolCallChunkFunction = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function")) {
+                    let function : ?ChatCompletionMessageToolCallChunkFunction = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function")) {
                         case (?function_field) (ChatCompletionMessageToolCallChunkFunction.fromCandidValue(function_field.1));
                         case null null;
                     };

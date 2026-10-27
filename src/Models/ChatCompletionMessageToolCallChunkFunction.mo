@@ -52,12 +52,12 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionMessageToolCallChunkFunction =
             switch (candid) {
-                case (#Record(fields)) {
-                    let name : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name")) {
+                case (#Record(record__)) {
+                    let name : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name")) {
                         case (?name_field) ((switch (name_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let arguments : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "arguments")) {
+                    let arguments : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "arguments")) {
                         case (?arguments_field) ((switch (arguments_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

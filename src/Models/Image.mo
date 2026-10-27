@@ -58,16 +58,16 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?Image =
             switch (candid) {
-                case (#Record(fields)) {
-                    let b64_json : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "b64_json")) {
+                case (#Record(record__)) {
+                    let b64_json : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "b64_json")) {
                         case (?b64_json_field) ((switch (b64_json_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let url : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "url")) {
+                    let url : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "url")) {
                         case (?url_field) ((switch (url_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let revised_prompt : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "revised_prompt")) {
+                    let revised_prompt : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "revised_prompt")) {
                         case (?revised_prompt_field) ((switch (revised_prompt_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

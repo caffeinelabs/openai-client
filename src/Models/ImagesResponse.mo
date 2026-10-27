@@ -60,10 +60,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ImagesResponse =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?created_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
+                case (#Record(record__)) {
+                    let ?created_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "created") else return null;
                     let ?created = ((switch (created_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let data : ?[Image] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data")) {
+                    let data : ?[Image] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data")) {
                         case (?data_field) ((switch (data_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Image>();
@@ -77,7 +77,7 @@ module {
                     }));
                         case null null;
                     };
-                    let usage : ?ImagesResponseUsage = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage")) {
+                    let usage : ?ImagesResponseUsage = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage")) {
                         case (?usage_field) (ImagesResponseUsage.fromCandidValue(usage_field.1));
                         case null null;
                     };

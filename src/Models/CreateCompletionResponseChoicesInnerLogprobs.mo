@@ -64,8 +64,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateCompletionResponseChoicesInnerLogprobs =
             switch (candid) {
-                case (#Record(fields)) {
-                    let text_offset : ?[Int] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text_offset")) {
+                case (#Record(record__)) {
+                    let text_offset : ?[Int] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text_offset")) {
                         case (?text_offset_field) ((switch (text_offset_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Int>();
@@ -79,7 +79,7 @@ module {
                     }));
                         case null null;
                     };
-                    let token_logprobs : ?[Float] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token_logprobs")) {
+                    let token_logprobs : ?[Float] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "token_logprobs")) {
                         case (?token_logprobs_field) ((switch (token_logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Float>();
@@ -93,7 +93,7 @@ module {
                     }));
                         case null null;
                     };
-                    let tokens : ?[Text] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tokens")) {
+                    let tokens : ?[Text] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "tokens")) {
                         case (?tokens_field) ((switch (tokens_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Text>();
@@ -107,7 +107,7 @@ module {
                     }));
                         case null null;
                     };
-                    let top_logprobs : ?[Map<Text, Float>] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_logprobs")) {
+                    let top_logprobs : ?[Map<Text, Float>] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "top_logprobs")) {
                         case (?top_logprobs_field) ((switch (top_logprobs_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Map<Text, Float>>();

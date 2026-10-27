@@ -53,10 +53,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?Embedding =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?index_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
+                case (#Record(record__)) {
+                    let ?index_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "index") else return null;
                     let ?index = ((switch (index_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?embedding_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "embedding") else return null;
+                    let ?embedding_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "embedding") else return null;
                     let ?embedding = ((switch (embedding_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Float>();
@@ -68,7 +68,7 @@ module {
                         };
                         case _ null;
                     })) else return null;
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (EmbeddingObject.fromCandidValue(object__field.1)) else return null;
                     ?{
                         index;

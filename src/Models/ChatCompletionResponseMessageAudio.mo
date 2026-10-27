@@ -55,14 +55,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionResponseMessageAudio =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?id_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
+                case (#Record(record__)) {
+                    let ?id_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "id") else return null;
                     let ?id = ((switch (id_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?expires_at_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "expires_at") else return null;
+                    let ?expires_at_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "expires_at") else return null;
                     let ?expires_at = ((switch (expires_at_field.1) { case (#Int(i)) ?i; case (#Nat(n)) ?n; case _ null })) else return null;
-                    let ?data_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
+                    let ?data_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
                     let ?data = ((switch (data_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?transcript_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "transcript") else return null;
+                    let ?transcript_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "transcript") else return null;
                     let ?transcript = ((switch (transcript_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         id;

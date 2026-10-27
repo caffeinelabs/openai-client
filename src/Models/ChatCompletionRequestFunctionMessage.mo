@@ -54,14 +54,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestFunctionMessage =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?role_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
+                case (#Record(record__)) {
+                    let ?role_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "role") else return null;
                     let ?role = (ChatCompletionRequestFunctionMessageRole.fromCandidValue(role_field.1)) else return null;
-                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
+                    let content : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "content")) {
                         case (?content_field) ((switch (content_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let ?name_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
+                    let ?name_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "name") else return null;
                     let ?name = ((switch (name_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
                     ?{
                         role;

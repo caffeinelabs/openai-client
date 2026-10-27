@@ -1,19 +1,14 @@
 [toolchain]
-moc = "1.4.1"
+moc = "1.6.0"
 
 [package]
 name = "openai-client"
-version = "0.2.5"
+version = "0.3.0"
 description = "Generated Motoko client for OpenAI API"
-repository = "https://github.com/caffeinelabs/openai-client"
+repository = "https://github.com/caffeinelabs/skills"
 license = "Apache-2.0"
 files = ["src/Config.mo", "src/Apis/**/*.mo", "src/Models/**/*.mo"]
 
 [dependencies]
-core = "2.4.0"
-serde-core = "0.1.4" # ggreif/serde fork: skip_null_fields (NatLabs/serde#44) + Map<K,V> cycle fix + decodeOne/fromCandidWith re-exports + \u-escape & surrogate-pair JSON parser (aviate-labs/json.mo#8) + RFC 8259 §7 string escaping in JSON.fromCandid (root: aviate-labs/json.mo#9)
-"cbor@4.1.0" = "4.1.0"
-"itertools@0.2.2" = "0.2.2" # because for serde-core
-base = "0.16.0" # because serde-core uses json.mo submodule
-xtended-numbers = "2.3.0"
-"sha2@0.1.6" = "0.1.6"
+core = "2.6.0"
+serde-core = "0.2.1" # ggreif/serde fork (branch `core`), DE-BASED: skip_null_fields (NatLabs/serde#44) + Map<K,V> cycle fix + \u-escape/surrogate-pair/RFC 8259 §7 JSON escaping. A build depending on it resolves core + sha2 ONLY — no base, no buffer, no second core: 0.2.1 vendors buffer/cbor/xtended-numbers/ByteUtils behind relative imports (verified with a consumer probe). base is dev-only upstream. Supersedes 0.2.0, whose residual base@0.16 came via buffer@0.1.0 (edjCase/motoko_buffer#1, still unanswered).

@@ -66,14 +66,14 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateTranscriptionResponseVerboseJson =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?language_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "language") else return null;
+                case (#Record(record__)) {
+                    let ?language_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "language") else return null;
                     let ?language = ((switch (language_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?duration_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "duration") else return null;
+                    let ?duration_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "duration") else return null;
                     let ?duration = ((switch (duration_field.1) { case (#Float(f)) ?f; case (#Int(i)) ?Float.fromInt(i); case (#Nat(n)) ?Float.fromInt(n); case _ null })) else return null;
-                    let ?text__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
+                    let ?text__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "text") else return null;
                     let ?text_ = ((switch (text__field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let words : ?[TranscriptionWord] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "words")) {
+                    let words : ?[TranscriptionWord] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "words")) {
                         case (?words_field) ((switch (words_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<TranscriptionWord>();
@@ -87,7 +87,7 @@ module {
                     }));
                         case null null;
                     };
-                    let segments : ?[TranscriptionSegment] = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "segments")) {
+                    let segments : ?[TranscriptionSegment] = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "segments")) {
                         case (?segments_field) ((switch (segments_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<TranscriptionSegment>();

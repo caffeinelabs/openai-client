@@ -63,20 +63,20 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?WebSearchLocation =
             switch (candid) {
-                case (#Record(fields)) {
-                    let country : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "country")) {
+                case (#Record(record__)) {
+                    let country : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "country")) {
                         case (?country_field) ((switch (country_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let region_ : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "region")) {
+                    let region_ : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "region")) {
                         case (?region__field) ((switch (region__field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let city : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "city")) {
+                    let city : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "city")) {
                         case (?city_field) ((switch (city_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };
-                    let timezone : ?Text = switch (Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "timezone")) {
+                    let timezone : ?Text = switch (Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "timezone")) {
                         case (?timezone_field) ((switch (timezone_field.1) { case (#Text(s)) ?s; case _ null }));
                         case null null;
                     };

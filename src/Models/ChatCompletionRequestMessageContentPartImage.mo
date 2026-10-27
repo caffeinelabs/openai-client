@@ -51,10 +51,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionRequestMessageContentPartImage =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                case (#Record(record__)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
                     let ?type_ = (ChatCompletionRequestMessageContentPartImageType.fromCandidValue(type__field.1)) else return null;
-                    let ?image_url_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "image_url") else return null;
+                    let ?image_url_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "image_url") else return null;
                     let ?image_url = (ChatCompletionRequestMessageContentPartImageImageUrl.fromCandidValue(image_url_field.1)) else return null;
                     ?{
                         type_;

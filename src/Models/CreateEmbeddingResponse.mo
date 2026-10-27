@@ -58,8 +58,8 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?CreateEmbeddingResponse =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?data_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
+                case (#Record(record__)) {
+                    let ?data_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "data") else return null;
                     let ?data = ((switch (data_field.1) {
                         case (#Array(xs__)) {
                             let buf__ = List.empty<Embedding>();
@@ -71,11 +71,11 @@ module {
                         };
                         case _ null;
                     })) else return null;
-                    let ?model_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
+                    let ?model_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "model") else return null;
                     let ?model = ((switch (model_field.1) { case (#Text(s)) ?s; case _ null })) else return null;
-                    let ?object__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
+                    let ?object__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "object") else return null;
                     let ?object_ = (CreateEmbeddingResponseObject.fromCandidValue(object__field.1)) else return null;
-                    let ?usage_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage") else return null;
+                    let ?usage_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "usage") else return null;
                     let ?usage = (CreateEmbeddingResponseUsage.fromCandidValue(usage_field.1)) else return null;
                     ?{
                         data;

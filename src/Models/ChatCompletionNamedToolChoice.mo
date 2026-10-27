@@ -51,10 +51,10 @@ module {
 
         public func fromCandidValue(candid : Candid.Candid) : ?ChatCompletionNamedToolChoice =
             switch (candid) {
-                case (#Record(fields)) {
-                    let ?type__field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
+                case (#Record(record__)) {
+                    let ?type__field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "type") else return null;
                     let ?type_ = (ChatCompletionMessageToolCallType.fromCandidValue(type__field.1)) else return null;
-                    let ?function_field = Array.find<(Text, Candid.Candid)>(fields, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function") else return null;
+                    let ?function_field = Array.find<(Text, Candid.Candid)>(record__, func((k, _) : (Text, Candid.Candid)) : Bool = k == "function") else return null;
                     let ?function = (AssistantsNamedToolChoiceFunction.fromCandidValue(function_field.1)) else return null;
                     ?{
                         type_;

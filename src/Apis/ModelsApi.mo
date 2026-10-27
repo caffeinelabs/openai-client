@@ -9,58 +9,32 @@ import Array "mo:core/Array";
 import List "mo:core/List";
 import Error "mo:core/Error";
 import Base64 "mo:core/Base64";
+import Char "mo:core/Char";
+import Nat8 "mo:core/Nat8";
+import Nat32 "mo:core/Nat32";
 import { JSON; Candid } "mo:serde-core";
 import { type DeleteModelResponse; JSON = DeleteModelResponse } "../Models/DeleteModelResponse";
 import { type ListModelsResponse; JSON = ListModelsResponse } "../Models/ListModelsResponse";
 import { type Model; JSON = Model } "../Models/Model";
-import { type Config } "../Config";
+import { type Config; _Helpers; _Ic } "../Config";
 
 module {
-    // Management Canister interface for HTTP outcalls
-    // Based on https://github.com/dfinity/interface-spec/blob/master/spec/ic.did
-    type http_header = {
-        name : Text;
-        value : Text;
-    };
-
-    type http_method = {
-        #get;
-        #head;
-        #post;
-        #put;    // Non-replicated only (is_replicated forced to ?false in generated code)
-        #delete; // Non-replicated only (is_replicated forced to ?false in generated code)
-    };
-
-    type http_request_args = {
-        url : Text;
-        max_response_bytes : ?Nat64;
-        method : http_method;
-        headers : [http_header];
-        body : ?Blob;
-        transform : ?{
-            function : shared query ({ response : http_request_result; context : Blob }) -> async http_request_result;
-            context : Blob;
-        };
-        is_replicated : ?Bool;
-    };
-
-    type http_request_result = {
-        status : Nat;
-        headers : [http_header];
-        body : Blob;
-    };
-
-    let http_request = (actor "aaaaa-aa" : actor { http_request : (http_request_args) -> async http_request_result }).http_request;
-
+        // mo:core/Base64 provides `decode` (caffeinelabs/motoko-core#507); alias it
+        // instead of inlining. `_`-prefixed so it never triggers an unused-identifier
+        // warning in modules that import Base64 only for encoding.
+        let _decode = Base64.decode;
 
     /// Delete a fine-tuned model. You must have the Owner role in your organization to delete a model.
     public func deleteModel(config : Config, model : Text) : async* DeleteModelResponse {
+        // x-server-override (set by spec-merge per input) pins this
+        // operation to the right host for multi-spec merged clients;
+        // when absent we use config.baseUrl as before.
         let {baseUrl; cycles} = config;
         let baseUrl__ = baseUrl # "/models/{model}"
-            |> Text.replace(_, #text "{model}", model);
+            |> Text.replace(_, #text "{model}", _Helpers.encodeComponent(model));
 
         // Add API key as query parameter if using apiKey auth
-        let url = switch (config.auth) {
+        let url__ = switch (config.auth) {
             case _ baseUrl__;
         };
 
@@ -84,35 +58,36 @@ module {
             case null [];
         };
 
-        let headers = Array.flatten<http_header>([
+        let headers = Array.flatten<_Ic.HttpHeader>([
             baseHeaders,
             authHeaders
         ]);
 
-        let request : http_request_args = { config with
-            url;
+        let request : _Ic.HttpRequestArgs = { config with
+            url = url__;
             method = #delete;
             headers;
+            is_replicated = ?false; // DELETE requires non-replicated mode on IC
             body = null;
         };
 
         // Call the management canister's http_request method with cycles
-        let response : http_request_result = await (with cycles) http_request(request);
+        let response : _Ic.HttpRequestResult = await (with cycles) _Ic.http_request(request);
 
         // Check HTTP status code before parsing
         if (response.status >= 200 and response.status < 300) {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to decode response body as UTF-8"));
             }) |>
             (switch (JSON.toCandid(_)) {
                 case (#ok(c__)) c__;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to parse JSON: ") # msg);
             }) |>
             (switch (DeleteModelResponse.fromCandidValue(_)) {
                 case (?value) value;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to convert response to DeleteModelResponse");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to convert response to DeleteModelResponse"));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -123,18 +98,21 @@ module {
 
 
             // Fallback for status codes not defined in OpenAPI spec
-            throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Unexpected error" #
+            throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Unexpected error") #
                 (if (responseText != "") { " - " # responseText } else { "" }));
         }
     };
 
     /// Lists the currently available models, and provides basic information about each one such as the owner and availability.
     public func listModels(config : Config) : async* ListModelsResponse {
+        // x-server-override (set by spec-merge per input) pins this
+        // operation to the right host for multi-spec merged clients;
+        // when absent we use config.baseUrl as before.
         let {baseUrl; cycles} = config;
         let baseUrl__ = baseUrl # "/models";
 
         // Add API key as query parameter if using apiKey auth
-        let url = switch (config.auth) {
+        let url__ = switch (config.auth) {
             case _ baseUrl__;
         };
 
@@ -158,35 +136,35 @@ module {
             case null [];
         };
 
-        let headers = Array.flatten<http_header>([
+        let headers = Array.flatten<_Ic.HttpHeader>([
             baseHeaders,
             authHeaders
         ]);
 
-        let request : http_request_args = { config with
-            url;
+        let request : _Ic.HttpRequestArgs = { config with
+            url = url__;
             method = #get;
             headers;
             body = null;
         };
 
         // Call the management canister's http_request method with cycles
-        let response : http_request_result = await (with cycles) http_request(request);
+        let response : _Ic.HttpRequestResult = await (with cycles) _Ic.http_request(request);
 
         // Check HTTP status code before parsing
         if (response.status >= 200 and response.status < 300) {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to decode response body as UTF-8"));
             }) |>
             (switch (JSON.toCandid(_)) {
                 case (#ok(c__)) c__;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to parse JSON: ") # msg);
             }) |>
             (switch (ListModelsResponse.fromCandidValue(_)) {
                 case (?value) value;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to convert response to ListModelsResponse");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to convert response to ListModelsResponse"));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -197,19 +175,22 @@ module {
 
 
             // Fallback for status codes not defined in OpenAPI spec
-            throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Unexpected error" #
+            throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Unexpected error") #
                 (if (responseText != "") { " - " # responseText } else { "" }));
         }
     };
 
     /// Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
     public func retrieveModel(config : Config, model : Text) : async* Model {
+        // x-server-override (set by spec-merge per input) pins this
+        // operation to the right host for multi-spec merged clients;
+        // when absent we use config.baseUrl as before.
         let {baseUrl; cycles} = config;
         let baseUrl__ = baseUrl # "/models/{model}"
-            |> Text.replace(_, #text "{model}", model);
+            |> Text.replace(_, #text "{model}", _Helpers.encodeComponent(model));
 
         // Add API key as query parameter if using apiKey auth
-        let url = switch (config.auth) {
+        let url__ = switch (config.auth) {
             case _ baseUrl__;
         };
 
@@ -233,35 +214,35 @@ module {
             case null [];
         };
 
-        let headers = Array.flatten<http_header>([
+        let headers = Array.flatten<_Ic.HttpHeader>([
             baseHeaders,
             authHeaders
         ]);
 
-        let request : http_request_args = { config with
-            url;
+        let request : _Ic.HttpRequestArgs = { config with
+            url = url__;
             method = #get;
             headers;
             body = null;
         };
 
         // Call the management canister's http_request method with cycles
-        let response : http_request_result = await (with cycles) http_request(request);
+        let response : _Ic.HttpRequestResult = await (with cycles) _Ic.http_request(request);
 
         // Check HTTP status code before parsing
         if (response.status >= 200 and response.status < 300) {
             // Success response (2xx): parse as expected return type
             (switch (Text.decodeUtf8(response.body)) {
                 case (?text) text;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to decode response body as UTF-8");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to decode response body as UTF-8"));
             }) |>
             (switch (JSON.toCandid(_)) {
                 case (#ok(c__)) c__;
-                case (#err(msg)) throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to parse JSON: " # msg);
+                case (#err(msg)) throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to parse JSON: ") # msg);
             }) |>
             (switch (Model.fromCandidValue(_)) {
                 case (?value) value;
-                case null throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Failed to convert response to Model");
+                case null throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Failed to convert response to Model"));
             })
         } else {
             // Error response (4xx, 5xx): parse error models and throw
@@ -272,7 +253,7 @@ module {
 
 
             // Fallback for status codes not defined in OpenAPI spec
-            throw Error.reject("HTTP " # Int.toText(response.status) # " body[" # Nat.toText(response.body.size()) # "B]=" # (switch (Text.decodeUtf8(response.body)) { case (?t) (if (t.size() > 100) Text.fromIter(Iter.take<Char>(t.chars(), 100)) # "..." else t); case null "(undecodable)" }) # ": Unexpected error" #
+            throw Error.reject(_Helpers.rejectMessage(response.status, response.body, "Unexpected error") #
                 (if (responseText != "") { " - " # responseText } else { "" }));
         }
     };
